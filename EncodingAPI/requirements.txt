@@ -1,0 +1,7 @@
+asgiref @ file:///opt/miniconda3/conda-bld/asgiref_1760342044893/work
+Django @ file:///opt/miniconda3/conda-bld/django_1760519133824/work
+django-cors-headers==4.9.0
+djangorestframework==3.16.1
+setuptools==80.9.0
+sqlparse @ file:///Users/builder/cbouss/buildout/croot/sqlparse_1739487468098/work
+wheel==0.45.1
