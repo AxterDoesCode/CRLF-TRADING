@@ -24,13 +24,13 @@ app.post("/player", (req, res) => {
     if (players.has(playerId)) {
         return res.status(400).json({ error: "Player already exists" });
     }
-    
+
     players.set(playerId, {
         id: playerId,
         virtual_balance: 100000.00,
         orders: [],
     });
-    
+
     res.json({ message: "Player created", playerId: playerId });
 });
 
@@ -54,7 +54,7 @@ app.get("/portfolio/:playerId", (req, res) => {
     if (!player) {
         return res.status(404).json({ error: "Player not found" });
     }
-    
+
     const portfolioSnapshots = [];
     const start = Math.max(0, T_NOW - 60);
 
@@ -110,7 +110,7 @@ app.get("/portfolio/:playerId", (req, res) => {
         // Only create snapshots for the range [start, T_NOW]
         if (t >= start) {
             const snapshot = JSON.parse(JSON.stringify(currentPortfolio)); // deep copy
-            
+
             // Update prices and values for current timestamp
             for (const sym in snapshot) {
                 if (sym !== 'cash') {
@@ -118,10 +118,10 @@ app.get("/portfolio/:playerId", (req, res) => {
                     snapshot[sym].value = snapshot[sym].quantity * snapshot[sym].price_per_share;
                 }
             }
-            
+
             snapshot.cash.value = snapshot.cash.amount * 1.00;
             snapshot.timestamp = t;
-            
+
             portfolioSnapshots.push(snapshot);
         }
     }
@@ -209,7 +209,7 @@ app.get("/portfolio/:playerId", (req, res) => {
 //             }
 //         }
 //     }
-    
+
 //     // Finally, ensure we have a snapshot at T_NOW
 //     if (last_t < T_NOW || portfolioSnapshots.length == 0) {
 //         last_t = portfolioSnapshots.length == 0 ? start - 1 : last_t;
@@ -231,7 +231,7 @@ app.get("/portfolio/:playerId", (req, res) => {
 //     return res.json(portfolioSnapshots);
 // });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3003;
 app.listen(PORT, () => {
     console.log(`Trading API server running on port ${PORT}`);
 });

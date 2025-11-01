@@ -1,2 +1,3 @@
 EncodingAPI: 8000
-TradingAPI: 8001
+TradingAPI: 3003
+Frontend: 3000
