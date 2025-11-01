@@ -1,10 +1,10 @@
 #pass
 
-request = {
-    "buy": True,
-    "shares": 16,
-    "ticker": "MSFT",
-}
+# request = {
+#     "buy": True,
+#     "shares": 16,
+#     "ticker": "MSFT",
+# }
 
 # relations = {
 #     "buy": "26000010", #skeletons
@@ -32,19 +32,19 @@ tickers_to_bits = {
 }
 
 bits_to_cards = [ #input card ids here
-    ["0", "1"],
-    ["2", "3"],
-    ["4", "5"],
-    ["6", "7"],
-    ["8", "9"],
-    ["10", "11"],
-    ["12", "13"],
-    ["14", "15"],
+    ["28000001", "26000005"], #arrows, minions
+    ["26000001", "26000000"], #archers, knight
+    ["28000000", "26000018"], #Fireball, Mini Pekka
+    ["26000014", "26000003"], #Musketeer, Giant
+    ["26000019", "26000002"], #Spear Goblins, Goblins
+    ["10", "27000001"], #Goblin Cage, Goblin Hut
+    ["26000013", "26000010"], #Bomber, Skeletons
+    ["27000009", "26000011"], #Tombstone, Valkyrie
 ]
 
 class Encode(object):
 
-    def __init__(self):
+    def __init__(self, request):
         self.request = request
 
     def encode_to_binary(self):
@@ -83,8 +83,8 @@ class Encode(object):
         binary_shares = "{0:05b}".format(shares)
         return binary_shares
     
-encode = Encode()
-binary_encoding = encode.encode_to_binary()
-print("binary encoding: ", binary_encoding)
-deck_encoding = encode.encode_to_deck(binary_encoding)
-print("deck encoding: ", deck_encoding)
+# encode = Encode(request)
+# binary_encoding = encode.encode_to_binary()
+# print("binary encoding: ", binary_encoding)
+# deck_encoding = encode.encode_to_deck(binary_encoding)
+# print("deck encoding: ", deck_encoding)
