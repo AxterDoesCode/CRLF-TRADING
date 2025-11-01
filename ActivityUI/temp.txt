@@ -1,0 +1,37 @@
+Clash Royale–Themed Trading Application — User Activity UI
+- Technical Stack
+Frontend: React / Next.js
+Backend: Node.js
+Design: Incorporate Clash Royale–style visuals, fancy images, and animated effects to create an engaging, game-like atmosphere.
+
+- Core UI Layout
+The main page features two interactive portals:
+Execution Portal — for placing and managing trades.
+Result Portal — for viewing trade outcomes and statistics.
+
+1. Login Page (Mock Implementation)
+Create a login screen resembling a company trading account.
+Users enter mock credentials (User ID and Password) to access the system.
+Authentication is mocked only — no backend logic required yet.
+On successful login, redirect to the main dashboard with the two portals.
+2. Trading Panel (Execution Portal)
+The Execution Portal allows users to input trade details:
+Action: Buy / Sell, Price, Company Name, Amount
+Use a mock translator API to convert trade information into a Clash Royale–style “deck of players.”
+Add immersive animations and images inspired by Clash Royale when trades are entered or processed.
+3. Start Play Button
+Include a “Start Play” button that redirects to the Clash Royale game platform (placeholder for now).
+The user’s game result determines whether the trade executes or fails.
+4. Trade Outcome Logic (Mocked)
+After gameplay (mocked for now), poll a trading API to simulate trade results:
+Win → The trade executes successfully.
+Loss → The trade fails.
+Display feedback messages with Clash Royale–style animations (e.g., trophies, defeat flames, or confetti).
+5. Result Portal
+Fetch and display trading statistics and trade execution history from the mocked trading API.
+Use Clash Royale–inspired graphics (e.g., player avatars, crowns, badges) to visualize performance.
+
+- Future Extensions (For Later Implementation)
+Add multi-user support for a company view, showing multiple traders’ results in one dashboard.
+Implement real-time updates and live game–trade integration.
+Include leaderboards for competitive trading performance.

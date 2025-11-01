@@ -1,0 +1,235 @@
+@import "tailwindcss";
+@import 'ag-grid-community/styles/ag-grid.css';
+@import 'ag-grid-community/styles/ag-theme-alpine.css';
+@import 'ag-grid-community/styles/ag-theme-quartz.css';
+
+/* Clash Royale Theme Variables */
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --cr-blue: #3498db;
+  --cr-purple: #9b59b6;
+  --cr-gold: #f39c12;
+  --cr-orange: #e67e22;
+  --cr-red: #e74c3c;
+  --cr-green: #2ecc71;
+  --cr-dark-blue: #2c3e50;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background-attachment: fixed;
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Custom AG Grid styling */
+.ag-theme-alpine {
+  --ag-font-family: inherit;
+  --ag-font-size: 14px;
+  --ag-row-height: 42px;
+  --ag-header-height: 48px;
+}
+
+.ag-theme-alpine .ag-header-cell-label {
+  font-weight: 600;
+}
+
+.ag-theme-alpine .ag-row {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.ag-theme-alpine .ag-row:hover {
+  background-color: #f9fafb;
+}
+
+/* Clash Royale Custom Styles */
+.cr-title {
+  font-weight: 900;
+  text-shadow:
+    3px 3px 0px rgba(0, 0, 0, 0.3),
+    -1px -1px 0px rgba(255, 255, 255, 0.1);
+  letter-spacing: 1px;
+}
+
+.cr-subtitle {
+  font-weight: 700;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
+}
+
+/* CR Card Style */
+.cr-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 3px solid #f39c12;
+  border-radius: 16px;
+  box-shadow:
+    0 8px 16px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.cr-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+/* CR Button Style */
+.cr-button {
+  background: linear-gradient(180deg, #f39c12 0%, #e67e22 100%);
+  border: 3px solid #d68910;
+  border-radius: 12px;
+  box-shadow:
+    0 6px 0 #b8730c,
+    0 8px 16px rgba(0, 0, 0, 0.3);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.1s ease;
+  position: relative;
+  top: 0;
+}
+
+.cr-button:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 0 #b8730c,
+    0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.cr-button:active {
+  top: 4px;
+  box-shadow:
+    0 2px 0 #b8730c,
+    0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* CR Buy Button (Green) */
+.cr-button-buy {
+  background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%);
+  border-color: #229954;
+  box-shadow:
+    0 6px 0 #1e8449,
+    0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.cr-button-buy:hover {
+  box-shadow:
+    0 8px 0 #1e8449,
+    0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.cr-button-buy:active {
+  box-shadow:
+    0 2px 0 #1e8449,
+    0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* CR Sell Button (Red) */
+.cr-button-sell {
+  background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%);
+  border-color: #a93226;
+  box-shadow:
+    0 6px 0 #922b21,
+    0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.cr-button-sell:hover {
+  box-shadow:
+    0 8px 0 #922b21,
+    0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.cr-button-sell:active {
+  box-shadow:
+    0 2px 0 #922b21,
+    0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* CR Stats Panel */
+.cr-stats-panel {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  border: 3px solid #f39c12;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* CR Gold Text */
+.cr-gold-text {
+  color: #f39c12;
+  font-weight: 900;
+  text-shadow:
+    2px 2px 0px #b8730c,
+    -1px -1px 0px #ffd700;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #2c3e50;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #f39c12 0%, #e67e22 100%);
+  border-radius: 10px;
+  border: 2px solid #2c3e50;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #ffa726 0%, #f39c12 100%);
+}
+
+/* CR Input Fields */
+.cr-input {
+  background: rgba(52, 73, 94, 0.8);
+  border: 2px solid #f39c12;
+  border-radius: 8px;
+  color: white;
+  padding: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.cr-input:focus {
+  background: rgba(52, 73, 94, 0.95);
+  border-color: #ffa726;
+  box-shadow: 0 0 15px rgba(243, 156, 18, 0.4);
+  outline: none;
+}
+
+.cr-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
