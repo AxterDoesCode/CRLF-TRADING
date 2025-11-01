@@ -91,16 +91,56 @@ body {
   right: 0;
   height: 4px;
   background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.3) 50%,
-    transparent 100%
-  );
+      transparent 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      transparent 100%);
   animation: shimmer 3s infinite;
 }
 
 @keyframes shimmer {
-  0%, 100% { opacity: 0; }
-  50% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+/* CR Button - Clear variant */
+.cr-button-reset {
+  background: linear-gradient(180deg, #ff4b2b 0%, #c0392b 100%);
+  border: 3px solid #922b21;
+  border-radius: 12px;
+  box-shadow:
+    0 6px 0 #78281f,
+    0 8px 16px rgba(0, 0, 0, 0.3);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.1s ease;
+  position: relative;
+  top: 0;
+  color: white;
+}
+
+/* Hover and active effects */
+.cr-button-reset:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 0 #78281f,
+    0 10px 20px rgba(0, 0, 0, 0.4);
+  filter: brightness(1.15);
+}
+
+.cr-button-reset:active {
+  top: 4px;
+  box-shadow:
+    0 2px 0 #78281f,
+    0 4px 8px rgba(0, 0, 0, 0.3);
+  filter: brightness(0.9);
 }
 
 /* CR Button Style */

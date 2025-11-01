@@ -1,10 +1,31 @@
 'use client';
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 
 interface TradingPortalProps {
   onTradeSubmitted: () => void;
 }
+
+const cardImages: Record<string, string> = {
+  "28000001": "/res/arrows.png",
+  "26000005": "/res/minions.png",
+  "26000001": "/res/archer.png",
+  "26000000": "/res/knight.png",
+  "28000000": "/res/fireball.png",
+  "26000018": "/res/mini-pekka.png",
+  "26000014": "/res/musketeer.png",
+  "26000003": "/res/giant.png",
+  "26000019": "/res/spear-goblins.png",
+  "26000002": "/res/goblin.png",
+  "27000012": "/res/goblin-cage.png",
+  "27000001": "/res/goblin-hut.png",
+  "26000013": "/res/bomber.png",
+  "26000010": "/res/skeletons.png",
+  "27000009": "/res/tombstone.png",
+  "26000011": "/res/valkyrie.png",
+};
+
 
 export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) {
   const [action, setAction] = useState<'Buy' | 'Sell'>('Buy');
@@ -12,22 +33,27 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
   const [companyName, setCompanyName] = useState('');
   const [amount, setAmount] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [clashRoyaleDeck, setClashRoyaleDeck] = useState<any>(null);
+  const [clashRoyaleDeck, setClashRoyaleDeck] = useState<string[]>([]);
   const [message, setMessage] = useState('');
+
+  const clearCard = () => {
+    setClashRoyaleDeck([]);
+  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setMessage('');
-    setClashRoyaleDeck(null);
+    setClashRoyaleDeck([]);
 
     try {
       // Step 1: Translate to Clash Royale deck
-      const translatorResponse = await fetch('http://127.0.0.1:8000/encoding/encode', {
+      const translatorResponse = await fetch('api/translator', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          buy: true,
+          action: action,
           ticker: companyName,
           shares: parseInt(amount),
         })
@@ -40,8 +66,8 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
 
       console.log(translatorData)
 
-      setClashRoyaleDeck(translatorData.clashRoyaleDeck);
-
+      setClashRoyaleDeck(translatorData.clashRoyaleDeck.deck_encoding);
+      // setClashRoyaleDeck([1, 2, 3, 4, 6, 9, 10, 11])
       // Step 2: Execute trade with Clash Royale deck
       // const tradingResponse = await fetch('/api/trading', {
       //   method: 'POST',
@@ -171,6 +197,13 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
         >
           {isSubmitting ? '⏳ DEPLOYING DECK...' : '⚡ DEPLOY & BATTLE ⚡'}
         </button>
+        <button
+          type="button"
+          onClick={clearCard}
+          className="w-full py-4 px-4 font-black text-white text-lg cr-button-reset"
+        >
+          Clear Deck
+        </button>
       </form>
 
       {/* Message Display */}
@@ -183,35 +216,24 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
         </div>
       )}
 
-      {/* Clash Royale Deck Display */}
-      {clashRoyaleDeck && (
-        <div className="mt-6 cr-card p-5">
-          <h3 className="text-xl font-black text-white mb-3 text-center cr-subtitle">
-            🎴 {clashRoyaleDeck.deckName} 🎴
-          </h3>
-          <div className="text-center mb-4">
-            <span className="text-sm text-yellow-300 font-bold">
-              ⚡ Strategy: {clashRoyaleDeck.strategy}
-            </span>
-            <span className="cr-elixir ml-3">
-              {clashRoyaleDeck.totalElixir} 💧
-            </span>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {clashRoyaleDeck.cards.map((card: any, index: number) => (
-              <div
-                key={index}
-                className="bg-gradient-to-br from-slate-700 to-slate-800 p-3 rounded-lg border-2 border-yellow-500 shadow-lg"
-              >
-                <div className="font-black text-white text-sm">{card.card}</div>
-                <div className="text-xs text-yellow-300 font-semibold mt-1">
-                  ⭐ Lvl {card.level} • {card.elixir} 💧
-                </div>
-              </div>
-            ))}
-          </div>
+      {clashRoyaleDeck.length > 0 && (
+        <div className="grid grid-cols-4 gap-4 mt-8">
+          {clashRoyaleDeck.map((cardId, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 50, rotateY: 180 }}
+              animate={{ opacity: 1, y: 0, rotateY: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              className="bg-gradient-to-br from-yellow-600 to-orange-800 rounded-xl p-2 shadow-lg hover:scale-105 transform transition-all"
+            >
+              <img
+                src={cardImages[cardId]}
+                alt={`Card ${cardId}`}
+                className="rounded-lg w-full object-cover"
+              />
+            </motion.div>
+          ))}
         </div>
       )}
-    </div>
-  );
+    </div>);
 }
