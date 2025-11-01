@@ -165,7 +165,7 @@ func trophyChangeIsRecordMe(trophyChange int64) bool {
 func decodeDeck(c *http.Client, cards []Card) (TradeAction, error) {
 	cardIds := getTeamDeckCardIds(cards)
 
-	payload, err := json.Marshal(cardIds) // encode []int64 as JSON
+	payload, err := json.Marshal(cardIds) // encode []string as JSON
 	if err != nil {
 		log.Println(err)
 		return TradeAction{}, err
@@ -200,10 +200,10 @@ func decodeDeck(c *http.Client, cards []Card) (TradeAction, error) {
 	return action, nil
 }
 
-func getTeamDeckCardIds(cards []Card) []int64 {
-	var cardIds []int64
+func getTeamDeckCardIds(cards []Card) []string {
+	var cardIds []string
 	for _, card := range cards {
-		cardIds = append(cardIds, card.ID)
+		cardIds = append(cardIds, fmt.Sprintf("%d", card.ID))
 	}
 	return cardIds
 }
