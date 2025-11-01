@@ -34,6 +34,7 @@ func main() {
 }
 
 func pollPlayer(c *http.Client, baseUrl string) {
+	//%23 is a URL encoding for #
 	playerTag := "%232YLCP0R8"
 	url := fmt.Sprintf("%s/players/%s/battlelog", baseUrl, playerTag)
 
@@ -44,7 +45,6 @@ func pollPlayer(c *http.Client, baseUrl string) {
 	}
 
 	token := os.Getenv("API_KEY")
-
 	req.Header.Add("Authorization", "Bearer "+token)
 
 	// HTTP Request
@@ -77,9 +77,15 @@ func pollPlayer(c *http.Client, baseUrl string) {
 		return
 	}
 
+	// Perform the checks
+	// Check if the transaction exists in cache (PlayerName+OpponentName+Time?)
+	// Check if we won
+	// Send off the deck to the encoder
+	// Get the encoded action
+	// Hit the trading service with the order
+
 	// Some test shit
 	for i := 0; i < 8; i++ {
 		fmt.Println(battles[0].Team[0].Cards[i].Name)
 	}
-
 }
