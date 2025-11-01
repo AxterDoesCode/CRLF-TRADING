@@ -5,12 +5,12 @@ import TradingPortal from './components/TradingPortal';
 import ResultsPortal from './components/ResultsPortal';
 import { FinanceExample } from './src/FinanceExample';
 
-type Tab = 'market' | 'stats';
+type Tab =  'stats' | 'market';
 
 export default function Home() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [isTradingOpen, setIsTradingOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<Tab>('market');
+  const [activeTab, setActiveTab] = useState<Tab>('stats');
 
   const handleTradeSubmitted = () => {
     // Trigger a refresh of the results portal
@@ -18,8 +18,8 @@ export default function Home() {
   };
 
   const tabs = [
-    { id: 'market' as Tab, label: 'Market Dashboard', icon: '👑' },
     { id: 'stats' as Tab, label: 'My Trading Stats', icon: '⚔️' },
+    { id: 'market' as Tab, label: 'Market Dashboard', icon: '👑' },
   ];
 
   return (
@@ -116,6 +116,7 @@ export default function Home() {
             className="cr-button absolute left-0 top-0 -translate-x-full text-white px-1 py-1 rounded-l-2xl shadow-2xl flex flex-col items-center gap-3"
             aria-label={isTradingOpen ? 'Close Trading Panel' : 'Open Trading Panel'}
           >
+          <div class='flex flex-row'>
             <svg
               className={`w-6 h-6 transition-transform duration-300 ${isTradingOpen ? 'rotate-0' : 'rotate-180'}`}
               fill="none"
@@ -124,6 +125,14 @@ export default function Home() {
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
             </svg>
+            <div>
+              {!isTradingOpen ? 
+              'Open Trading':
+              'Close Trading'
+              }
+            </div>
+
+          </div>
           </button>
 
           {/* Trading Portal Panel */}

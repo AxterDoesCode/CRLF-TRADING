@@ -105,7 +105,7 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 h-[95vh]">
       <h2 className="text-3xl font-bold mb-6 text-white cr-subtitle text-center">
         ⚔️ BATTLE STATION ⚔️
       </h2>
@@ -156,7 +156,7 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
         </div>
 
         {/* Price */}
-        <div>
+        {/* <div>
           <label className="block text-sm font-bold text-yellow-300 mb-3 uppercase tracking-wide">
             💰 Price (Gold)
           </label>
@@ -169,7 +169,7 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
             placeholder="0.00"
             required
           />
-        </div>
+        </div> */}
 
         {/* Amount */}
         <div>
