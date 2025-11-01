@@ -85,9 +85,11 @@ type Clan struct {
 }
 
 type TradeAction struct {
-	Buy    bool   `json:"buy"`
-	Shares int64  `json:"shares"`
-	Ticker string `json:"ticker"`
+	Stock struct {
+		Buy    bool   `json:"buy"`
+		Ticker string `json:"ticker"`
+		Shares int64  `json:"shares"`
+	} `json:"stock"`
 }
 
 // Struct for sending deck data to encoding service
