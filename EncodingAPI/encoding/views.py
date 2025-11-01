@@ -17,7 +17,7 @@ class EncodeView(APIView):
 class DecodeView(APIView):
     def post(self, request):
         data = request.data
-        decode = Decode()
-        binary_decoding = decode.decode_from_deck_to_binary(data)
+        decode = Decode(data)
+        binary_decoding = decode.decode_from_deck_to_binary()
         stock = decode.decode_from_binary_to_stock(binary_decoding)
         return Response({"stock": stock})
