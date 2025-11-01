@@ -100,9 +100,10 @@ class Decode(object):
 
     def decode_from_deck_to_binary(self):
         binary_string = ""
+        deck = self.request.get("deck")
         for i in range(len(bits_to_cards)):
             for j in range(0,2):
-                if bits_to_cards[i][j] == self.request.get("deck")[i]:
+                if bits_to_cards[i][j] == deck[i]:
                     binary_string += str(j)
 
         return binary_string
