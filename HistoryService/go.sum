@@ -1,0 +1,6 @@
+github.com/gorilla/mux v1.8.1 h1:TuBL49tXwgrFYWhqrNgrUNEY92u81SPhu7sTdzQEiWY=
+github.com/gorilla/mux v1.8.1/go.mod h1:AKf9I4AEqPTmMytcMc0KkNouC66V3BtZ4qD5fmWSiMQ=
+github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
+github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
+github.com/overwolfmobile/go-clash v2.28.3+incompatible h1:5VvmQa/v5YzXRe6XUmVBP+N28AWEIqoq2wfD6w6LV08=
+github.com/overwolfmobile/go-clash v2.28.3+incompatible/go.mod h1:NWIO3aPN/rkz8xmyvVUPCKOe5z367kI29i/YFvs94oY=

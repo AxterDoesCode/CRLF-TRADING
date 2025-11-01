@@ -1,0 +1,2 @@
+EncodingAPI: 8000
+TradingAPI: 8001
