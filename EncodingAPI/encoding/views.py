@@ -11,6 +11,7 @@ class EncodeView(APIView):
         binary_encoding = encode.encode_to_binary()
         # print("binary encoding: ", binary_encoding)
         deck_encoding = encode.encode_to_deck(binary_encoding)
+        print(deck_encoding)
         # print("deck encoding: ", deck_encoding)
         return Response({"deck_encoding": deck_encoding})
     

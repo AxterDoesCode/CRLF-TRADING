@@ -23,16 +23,15 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
 
     try {
       // Step 1: Translate to Clash Royale deck
-      const translatorResponse = await fetch('/api/translator', {
+      const translatorResponse = await fetch('http://127.0.0.1:8000/encoding/encode', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          buy: action == 'Buy',
+          buy: true,
           ticker: companyName,
           shares: parseInt(amount),
         })
       });
-
       const translatorData = await translatorResponse.json();
 
       if (!translatorData.success) {
@@ -44,34 +43,34 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
       setClashRoyaleDeck(translatorData.clashRoyaleDeck);
 
       // Step 2: Execute trade with Clash Royale deck
-      const tradingResponse = await fetch('/api/trading', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action,
-          price: parseFloat(price),
-          companyName,
-          amount: parseInt(amount),
-          clashRoyaleDeck: translatorData.clashRoyaleDeck
-        })
-      });
+      // const tradingResponse = await fetch('/api/trading', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({
+      //     action,
+      //     price: parseFloat(price),
+      //     companyName,
+      //     amount: parseInt(amount),
+      //     clashRoyaleDeck: translatorData.clashRoyaleDeck
+      //   })
+      // });
 
-      const tradingData = await tradingResponse.json();
+      // const tradingData = await tradingResponse.json();
 
-      if (tradingData.success) {
-        setMessage(`Trade #${tradingData.tradeId} submitted! Estimated execution time: ${(tradingData.estimatedTime / 1000).toFixed(1)}s`);
+      // if (tradingData.success) {
+      //   setMessage(`Trade #${tradingData.tradeId} submitted! Estimated execution time: ${(tradingData.estimatedTime / 1000).toFixed(1)}s`);
 
-        // Reset form after successful submission
-        setTimeout(() => {
-          setPrice('');
-          setCompanyName('');
-          setAmount('');
-          setClashRoyaleDeck(null);
-          onTradeSubmitted();
-        }, 2000);
-      } else {
-        throw new Error('Failed to execute trade');
-      }
+      //   // Reset form after successful submission
+      //   setTimeout(() => {
+      //     setPrice('');
+      //     setCompanyName('');
+      //     setAmount('');
+      //     setClashRoyaleDeck(null);
+      //     onTradeSubmitted();
+      //   }, 2000);
+      // } else {
+      //   throw new Error('Failed to execute trade');
+      // }
     } catch (error) {
       setMessage('Error: Failed to submit trade. Please try again.');
     } finally {
