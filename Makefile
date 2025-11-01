@@ -17,3 +17,6 @@ encoding_api: python
 
 history_service: go
 	cd HistoryService && go build && ./m
+
+trading_api: npm
+	cd TradingAPI && npm install && node index.js
