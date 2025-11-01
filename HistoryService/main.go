@@ -12,7 +12,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
-const DEBUG_MODE = true
+const DEBUG_LOAD_BATTLES_FROM_FILE = false
+const DEBUG_LOSE_MODE = false
 
 func main() {
 	c := &http.Client{}
@@ -63,7 +64,7 @@ func requestPlayerBattleHistory(c *http.Client, baseUrl string) []Battle {
 
 	var body []byte
 
-	if DEBUG_MODE {
+	if DEBUG_LOAD_BATTLES_FROM_FILE {
 		// Just read from file
 		file, err := os.Open("test.json")
 		if err != nil {
@@ -114,7 +115,7 @@ func processBattleHistory(alreadyProcessedBattleHashes map[string]struct{}, batt
 
 		team := battle.Team[0]
 
-		if team.TrophyChange <= 0 {
+		if !(trophyChangeIsRecordMe(team.TrophyChange)) {
 			// Don't process losses
 			continue
 		}
@@ -122,6 +123,8 @@ func processBattleHistory(alreadyProcessedBattleHashes map[string]struct{}, batt
 		if _, exists := alreadyProcessedBattleHashes[getBattleHashId(battle)]; exists {
 			// Already processed
 			continue
+		} else {
+			alreadyProcessedBattleHashes[getBattleHashId(battle)] = struct{}{}
 		}
 
 		// TODO - Send off the deck to the encoder
@@ -140,4 +143,12 @@ func processBattleHistory(alreadyProcessedBattleHashes map[string]struct{}, batt
 func getBattleHashId(battle Battle) string {
 	// Use just the battle time and opponent tag
 	return fmt.Sprintf("%s-%s", battle.BattleTime, battle.Opponent[0].Tag)
+}
+
+func trophyChangeIsRecordMe(trophyChange int64) bool {
+	if DEBUG_LOSE_MODE {
+		return trophyChange < 0
+	} else {
+		return trophyChange > 0
+	}
 }
