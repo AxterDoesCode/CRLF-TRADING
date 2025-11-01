@@ -12,6 +12,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
+const DEBUG_MODE = true
+
 func main() {
 	c := &http.Client{}
 	baseUrl := "https://proxy.royaleapi.dev/v1"
@@ -22,18 +24,30 @@ func main() {
 		return
 	}
 
+	alreadyProcessedBattleHashes := make(map[string]struct{})
+
 	interval := 5 * time.Second
 	ticker := time.NewTicker(interval)
+
 	fmt.Println("Service running so swag")
+
 	for {
 		select {
 		case <-ticker.C:
-			pollPlayer(c, baseUrl)
+			runIteration(alreadyProcessedBattleHashes, c, baseUrl)
 		}
 	}
 }
 
-func pollPlayer(c *http.Client, baseUrl string) {
+func runIteration(alreadyProcessedBattleHashes map[string]struct{}, c *http.Client, baseUrl string) {
+	battles := requestPlayerBattleHistory(c, baseUrl)
+
+	processBattleHistory(alreadyProcessedBattleHashes, battles)
+}
+
+func requestPlayerBattleHistory(c *http.Client, baseUrl string) []Battle {
+	var battles []Battle
+
 	//%23 is a URL encoding for #
 	playerTag := "%232YLCP0R8"
 	url := fmt.Sprintf("%s/players/%s/battlelog", baseUrl, playerTag)
@@ -41,51 +55,89 @@ func pollPlayer(c *http.Client, baseUrl string) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Println(err)
-		return
+		return battles
 	}
 
 	token := os.Getenv("API_KEY")
 	req.Header.Add("Authorization", "Bearer "+token)
 
-	// HTTP Request
-	resp, err := c.Do(req)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	defer resp.Body.Close()
+	var body []byte
 
-	// file, err := os.Open("test.json")
-	// if err != nil {
-	// 	log.Println(err)
-	// }
-	//
-	// defer file.Close()
+	if DEBUG_MODE {
+		// Just read from file
+		file, err := os.Open("test.json")
+		if err != nil {
+			log.Println(err)
+		}
+		defer file.Close()
 
-	var battles []Battle
-	body, err := io.ReadAll(resp.Body)
-	// body, err := io.ReadAll(file)
-	if err != nil {
-		log.Println(err)
-		return
+		body, err = io.ReadAll(file)
+		if err != nil {
+			log.Println(err)
+			return battles
+		}
+	} else {
+		// HTTP Request
+		resp, err := c.Do(req)
+		if err != nil {
+			log.Println(err)
+			return battles
+		}
+		defer resp.Body.Close()
+
+		body, err = io.ReadAll(resp.Body)
+		if err != nil {
+			log.Println(err)
+			return battles
+		}
 	}
 
 	err = json.Unmarshal(body, &battles)
 	if err != nil {
 		fmt.Println("Error unmarshalling json resp")
 		log.Println(err)
-		return
+		return battles
 	}
 
-	// Perform the checks
-	// Check if the transaction exists in cache (PlayerName+OpponentName+Time?)
-	// Check if we won
-	// Send off the deck to the encoder
-	// Get the encoded action
-	// Hit the trading service with the order
+	return battles
+}
 
-	// Some test shit
-	for i := 0; i < 8; i++ {
-		fmt.Println(battles[0].Team[0].Cards[i].Name)
+func processBattleHistory(alreadyProcessedBattleHashes map[string]struct{}, battles []Battle) {
+	for _, battle := range battles {
+		if len(battle.Team) == 2 {
+			// Ignore 2v2s
+			continue
+		} else if len(battle.Team) != 1 {
+			log.Printf("Error: Unexpected team size: %d\n", len(battle.Team))
+			continue
+		}
+
+		team := battle.Team[0]
+
+		if team.TrophyChange <= 0 {
+			// Don't process losses
+			continue
+		}
+
+		if _, exists := alreadyProcessedBattleHashes[getBattleHashId(battle)]; exists {
+			// Already processed
+			continue
+		}
+
+		// TODO - Send off the deck to the encoder
+
+		// TODO - Hit the trading service with the order
+
+		// Just temporary
+		fmt.Printf("Processing: ")
+		for _, card := range team.Cards {
+			fmt.Printf("%s ", card.Name)
+		}
+		fmt.Printf("\n")
 	}
+}
+
+func getBattleHashId(battle Battle) string {
+	// Use just the battle time and opponent tag
+	return fmt.Sprintf("%s-%s", battle.BattleTime, battle.Opponent[0].Tag)
 }
