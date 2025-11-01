@@ -89,3 +89,8 @@ type TradeAction struct {
 	Shares int64  `json:"shares"`
 	Ticker string `json:"ticker"`
 }
+
+// Struct for sending deck data to encoding service
+type DeckStruct struct {
+	Deck []string `json:"deck"`
+}
