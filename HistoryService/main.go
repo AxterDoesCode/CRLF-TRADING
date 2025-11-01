@@ -171,6 +171,8 @@ func decodeDeck(c *http.Client, cards []Card) (TradeAction, error) {
 		return TradeAction{}, err
 	}
 
+    os.WriteFile("temp.json", payload, os.ModePerm)
+
 	req, err := http.NewRequest("POST", DECODE_API_URL, bytes.NewReader(payload))
 	if err != nil {
 		log.Println(err)
@@ -200,10 +202,12 @@ func decodeDeck(c *http.Client, cards []Card) (TradeAction, error) {
 	return action, nil
 }
 
-func getTeamDeckCardIds(cards []Card) []int64 {
-	var cardIds []int64
+func getTeamDeckCardIds(cards []Card) DeckStruct {
+	var cardIds []string
 	for _, card := range cards {
-		cardIds = append(cardIds, card.ID)
+		cardIds = append(cardIds, fmt.Sprintf("%d", card.ID))
 	}
-	return cardIds
+
+    deckStruct := DeckStruct{Deck: cardIds}
+	return deckStruct
 }
