@@ -105,19 +105,17 @@ export default function Home() {
 
         {/* Floating Trading Portal */}
         <div
-          className={`fixed top-24 right-6 z-50 transition-transform duration-300 ease-in-out ${isTradingOpen ? 'translate-x-0' : 'translate-x-[calc(100%+24px)]'
-            }`}
-          style={{ width: '480px' }}
+          className={`fixed top-[0%] right-6 z-50 transition-transform duration-500 ease-in-out 
+        ${isTradingOpen ? 'translate-x-0' : 'translate-x-full'}
+      `}
+          style={{ width: '30%', height: '10%' }}
         >
           {/* Toggle Button */}
           <button
             onClick={() => setIsTradingOpen(!isTradingOpen)}
-            className="cr-button absolute left-0 top-8 -translate-x-full text-white px-3 py-10 rounded-l-2xl shadow-2xl flex flex-col items-center gap-3"
+            className="cr-button absolute left-0 top-0 -translate-x-full text-white px-1 py-1 rounded-l-2xl shadow-2xl flex flex-col items-center gap-3"
             aria-label={isTradingOpen ? 'Close Trading Panel' : 'Open Trading Panel'}
           >
-            <span className="text-xs font-black rotate-[-90deg] whitespace-nowrap tracking-wider">
-              ⚔️ BATTLE ⚔️
-            </span>
             <svg
               className={`w-6 h-6 transition-transform duration-300 ${isTradingOpen ? 'rotate-0' : 'rotate-180'}`}
               fill="none"
@@ -130,7 +128,7 @@ export default function Home() {
 
           {/* Trading Portal Panel */}
           <div
-            className="cr-stats-panel shadow-2xl rounded-2xl overflow-hidden max-h-[calc(100vh-120px)] overflow-y-auto relative"
+            className="cr-stats-panel shadow-2xl rounded-2xl overflow-hidden max-h-[calc(100vh)] overflow-y-auto relative"
             style={{
               backgroundImage: 'url(/res/Spending_the_Loot.png)',
               backgroundSize: 'cover',

@@ -3,13 +3,13 @@ import { NextRequest, NextResponse } from 'next/server'
 export async function POST(request: NextRequest) {
   try {
     const tradeData = await request.json()
-    const { action, companyName, amount } = tradeData
-
+    const { action, ticker, shares } = tradeData
+    console.log("tradedata", tradeData,)
     // Convert trade info into the Python backend format
     const backendPayload = {
-      buy: action.toLowerCase() === 'buy',
-      shares: Number(amount),
-      ticker: companyName.toUpperCase()
+      buy: action === 'Buy',
+      shares: Number(shares),
+      ticker: ticker
     }
     console.log("bepayload", backendPayload)
     // Forward the request to your local backend
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(backendPayload)
     })
-
+    console.log('backendrespond', backendResponse)
     if (!backendResponse.ok) {
       throw new Error(`Backend returned ${backendResponse.status}`)
     }
