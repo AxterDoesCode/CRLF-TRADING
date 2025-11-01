@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
       shares: Number(amount),
       ticker: companyName.toUpperCase()
     }
-
+    console.log("bepayload", backendPayload)
     // Forward the request to your local backend
     const backendResponse = await fetch('http://127.0.0.1:8000/encoding/encode', {
       method: 'POST',
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     if (!backendResponse.ok) {
       throw new Error(`Backend returned ${backendResponse.status}`)
     }
-
+    console.log(backendResponse)
     const backendData = await backendResponse.json()
 
     // Return whatever your backend sent (the deck, combinations, etc.)
