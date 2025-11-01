@@ -105,7 +105,11 @@ class Decode(object):
             for j in range(0,2):
                 if bits_to_cards[i][j] == deck[i]:
                     binary_string += str(j)
-
+        
+        if len(binary_string) < 8:
+            if int(deck[0][-1]) % 2 == 1:
+                return ("1" + "0" * 7)
+            return("0" * 8)
         return binary_string
     
     def decode_from_binary_to_stock(self, binary_string):
