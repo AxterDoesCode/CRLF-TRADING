@@ -1,61 +1,61 @@
 package main
 
 type Battle struct {
-	Type               string     `json:"type"`              
-	BattleTime         string     `json:"battleTime"`        
+	Type               string     `json:"type"`
+	BattleTime         string     `json:"battleTime"`
 	IsLadderTournament bool       `json:"isLadderTournament"`
-	Arena              Arena      `json:"arena"`             
-	GameMode           Arena      `json:"gameMode"`          
-	DeckSelection      string     `json:"deckSelection"`     
-	Team               []Team     `json:"team"`              
-	Opponent           []Opponent `json:"opponent"`          
-	IsHostedMatch      bool       `json:"isHostedMatch"`     
-	LeagueNumber       int64      `json:"leagueNumber"`      
+	Arena              Arena      `json:"arena"`
+	GameMode           Arena      `json:"gameMode"`
+	DeckSelection      string     `json:"deckSelection"`
+	Team               []Team     `json:"team"`
+	Opponent           []Opponent `json:"opponent"`
+	IsHostedMatch      bool       `json:"isHostedMatch"`
+	LeagueNumber       int64      `json:"leagueNumber"`
 }
 
 type Arena struct {
-	ID   int64  `json:"id"`  
+	ID   int64  `json:"id"`
 	Name string `json:"name"`
 }
 
 type Opponent struct {
-	Tag                     string        `json:"tag"`                    
-	Name                    string        `json:"name"`                   
-	StartingTrophies        int64         `json:"startingTrophies"`       
-	TrophyChange            int64         `json:"trophyChange"`           
-	Crowns                  int64         `json:"crowns"`                 
-	KingTowerHitPoints      int64         `json:"kingTowerHitPoints"`     
+	Tag                     string        `json:"tag"`
+	Name                    string        `json:"name"`
+	StartingTrophies        int64         `json:"startingTrophies"`
+	TrophyChange            int64         `json:"trophyChange"`
+	Crowns                  int64         `json:"crowns"`
+	KingTowerHitPoints      int64         `json:"kingTowerHitPoints"`
 	PrincessTowersHitPoints []int64       `json:"princessTowersHitPoints"`
-	Cards                   []Card        `json:"cards"`                  
-	SupportCards            []SupportCard `json:"supportCards"`           
-	GlobalRank              interface{}   `json:"globalRank"`             
-	ElixirLeaked            float64       `json:"elixirLeaked"`           
+	Cards                   []Card        `json:"cards"`
+	SupportCards            []SupportCard `json:"supportCards"`
+	GlobalRank              interface{}   `json:"globalRank"`
+	ElixirLeaked            float64       `json:"elixirLeaked"`
 }
 
 type Card struct {
-	Name              string       `json:"name"`                       
-	ID                int64        `json:"id"`                         
-	Level             int64        `json:"level"`                      
-	EvolutionLevel    *int64       `json:"evolutionLevel,omitempty"`   
-	MaxLevel          int64        `json:"maxLevel"`                   
+	Name              string       `json:"name"`
+	ID                int64        `json:"id"`
+	Level             int64        `json:"level"`
+	EvolutionLevel    *int64       `json:"evolutionLevel,omitempty"`
+	MaxLevel          int64        `json:"maxLevel"`
 	MaxEvolutionLevel *int64       `json:"maxEvolutionLevel,omitempty"`
-	Rarity            string       `json:"rarity"`                     
-	ElixirCost        int64        `json:"elixirCost"`                 
-	IconUrls          CardIconUrls `json:"iconUrls"`                   
-	StarLevel         *int64       `json:"starLevel,omitempty"`        
+	Rarity            string       `json:"rarity"`
+	ElixirCost        int64        `json:"elixirCost"`
+	IconUrls          CardIconUrls `json:"iconUrls"`
+	StarLevel         *int64       `json:"starLevel,omitempty"`
 }
 
 type CardIconUrls struct {
-	Medium          string  `json:"medium"`                   
+	Medium          string  `json:"medium"`
 	EvolutionMedium *string `json:"evolutionMedium,omitempty"`
 }
 
 type SupportCard struct {
-	Name     string              `json:"name"`    
-	ID       int64               `json:"id"`      
-	Level    int64               `json:"level"`   
+	Name     string              `json:"name"`
+	ID       int64               `json:"id"`
+	Level    int64               `json:"level"`
 	MaxLevel int64               `json:"maxLevel"`
-	Rarity   string              `json:"rarity"`  
+	Rarity   string              `json:"rarity"`
 	IconUrls SupportCardIconUrls `json:"iconUrls"`
 }
 
@@ -64,22 +64,28 @@ type SupportCardIconUrls struct {
 }
 
 type Team struct {
-	Tag                     string        `json:"tag"`                    
-	Name                    string        `json:"name"`                   
-	StartingTrophies        int64         `json:"startingTrophies"`       
-	TrophyChange            int64         `json:"trophyChange"`           
-	Crowns                  int64         `json:"crowns"`                 
-	KingTowerHitPoints      int64         `json:"kingTowerHitPoints"`     
+	Tag                     string        `json:"tag"`
+	Name                    string        `json:"name"`
+	StartingTrophies        int64         `json:"startingTrophies"`
+	TrophyChange            int64         `json:"trophyChange"`
+	Crowns                  int64         `json:"crowns"`
+	KingTowerHitPoints      int64         `json:"kingTowerHitPoints"`
 	PrincessTowersHitPoints interface{}   `json:"princessTowersHitPoints"`
-	Clan                    Clan          `json:"clan"`                   
-	Cards                   []Card        `json:"cards"`                  
-	SupportCards            []SupportCard `json:"supportCards"`           
-	GlobalRank              interface{}   `json:"globalRank"`             
-	ElixirLeaked            float64       `json:"elixirLeaked"`           
+	Clan                    Clan          `json:"clan"`
+	Cards                   []Card        `json:"cards"`
+	SupportCards            []SupportCard `json:"supportCards"`
+	GlobalRank              interface{}   `json:"globalRank"`
+	ElixirLeaked            float64       `json:"elixirLeaked"`
 }
 
 type Clan struct {
-	Tag     string `json:"tag"`    
-	Name    string `json:"name"`   
+	Tag     string `json:"tag"`
+	Name    string `json:"name"`
 	BadgeID int64  `json:"badgeId"`
+}
+
+type TradeAction struct {
+	Buy    bool   `json:"buy"`
+	Shares int64  `json:"shares"`
+	Ticker string `json:"ticker"`
 }

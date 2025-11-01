@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -15,9 +16,13 @@ import (
 const DEBUG_LOAD_BATTLES_FROM_FILE = false
 const DEBUG_LOSE_MODE = false
 
+const ROYALE_API_URL = "https://proxy.royaleapi.dev/v1"
+const ENCODE_API_URL = "http://localhost:8000/encoding/encode"
+const DECODE_API_URL = "http://localhost:8000/encoding/decode"
+
 func main() {
 	c := &http.Client{}
-	baseUrl := "https://proxy.royaleapi.dev/v1"
+	baseUrl := ROYALE_API_URL
 
 	err := godotenv.Load()
 	if err != nil {
@@ -40,32 +45,23 @@ func main() {
 	}
 }
 
-func runIteration(alreadyProcessedBattleHashes map[string]struct{}, c *http.Client, baseUrl string) {
-	battles := requestPlayerBattleHistory(c, baseUrl)
+func runIteration(alreadyProcessedBattleHashes map[string]struct{}, client *http.Client, baseUrl string) {
+	battles := requestPlayerBattleHistory(client, baseUrl)
 
-	processBattleHistory(alreadyProcessedBattleHashes, battles)
+	processBattleHistory(client, alreadyProcessedBattleHashes, battles)
 }
 
-func requestPlayerBattleHistory(c *http.Client, baseUrl string) []Battle {
+func requestPlayerBattleHistory(client *http.Client, baseUrl string) []Battle {
 	var battles []Battle
 
 	//%23 is a URL encoding for #
 	playerTag := "%232YLCP0R8"
 	url := fmt.Sprintf("%s/players/%s/battlelog", baseUrl, playerTag)
 
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		log.Println(err)
-		return battles
-	}
-
-	token := os.Getenv("API_KEY")
-	req.Header.Add("Authorization", "Bearer "+token)
-
+	var err error
 	var body []byte
 
 	if DEBUG_LOAD_BATTLES_FROM_FILE {
-		// Just read from file
 		file, err := os.Open("test.json")
 		if err != nil {
 			log.Println(err)
@@ -78,8 +74,16 @@ func requestPlayerBattleHistory(c *http.Client, baseUrl string) []Battle {
 			return battles
 		}
 	} else {
-		// HTTP Request
-		resp, err := c.Do(req)
+		req, err := http.NewRequest("GET", url, nil)
+		if err != nil {
+			log.Println(err)
+			return battles
+		}
+
+		token := os.Getenv("API_KEY")
+		req.Header.Add("Authorization", "Bearer "+token)
+
+		resp, err := client.Do(req)
 		if err != nil {
 			log.Println(err)
 			return battles
@@ -103,7 +107,7 @@ func requestPlayerBattleHistory(c *http.Client, baseUrl string) []Battle {
 	return battles
 }
 
-func processBattleHistory(alreadyProcessedBattleHashes map[string]struct{}, battles []Battle) {
+func processBattleHistory(client *http.Client, alreadyProcessedBattleHashes map[string]struct{}, battles []Battle) {
 	for _, battle := range battles {
 		if len(battle.Team) == 2 {
 			// Ignore 2v2s
@@ -127,16 +131,21 @@ func processBattleHistory(alreadyProcessedBattleHashes map[string]struct{}, batt
 			alreadyProcessedBattleHashes[getBattleHashId(battle)] = struct{}{}
 		}
 
-		// TODO - Send off the deck to the encoder
+		log.Printf("Processing deck: ")
+		for _, card := range team.Cards {
+			log.Printf("%s ", card.Name)
+		}
+		log.Printf("\n")
+
+		actionToPerform, err := decodeDeck(client, team.Cards)
+		if err != nil {
+			log.Printf("Error decoding deck: %v\n", err)
+			continue
+		}
+
+		log.Printf("Decoded trade action: %+v\n", actionToPerform)
 
 		// TODO - Hit the trading service with the order
-
-		// Just temporary
-		fmt.Printf("Processing: ")
-		for _, card := range team.Cards {
-			fmt.Printf("%s ", card.Name)
-		}
-		fmt.Printf("\n")
 	}
 }
 
@@ -151,4 +160,50 @@ func trophyChangeIsRecordMe(trophyChange int64) bool {
 	} else {
 		return trophyChange > 0
 	}
+}
+
+func decodeDeck(c *http.Client, cards []Card) (TradeAction, error) {
+	cardIds := getTeamDeckCardIds(cards)
+
+	payload, err := json.Marshal(cardIds) // encode []int64 as JSON
+	if err != nil {
+		log.Println(err)
+		return TradeAction{}, err
+	}
+
+	req, err := http.NewRequest("POST", DECODE_API_URL, bytes.NewReader(payload))
+	if err != nil {
+		log.Println(err)
+		return TradeAction{}, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := c.Do(req)
+	if err != nil {
+		log.Println(err)
+		return TradeAction{}, err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Println(err)
+		return TradeAction{}, err
+	}
+
+	var action TradeAction
+	if err := json.Unmarshal(body, &action); err != nil {
+		log.Println(err)
+		return TradeAction{}, err
+	}
+
+	return action, nil
+}
+
+func getTeamDeckCardIds(cards []Card) []int64 {
+	var cardIds []int64
+	for _, card := range cards {
+		cardIds = append(cardIds, card.ID)
+	}
+	return cardIds
 }
