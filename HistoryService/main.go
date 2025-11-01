@@ -171,7 +171,7 @@ func decodeDeck(c *http.Client, cards []Card) (TradeAction, error) {
 		return TradeAction{}, err
 	}
 
-    os.WriteFile("temp.json", payload, os.ModePerm)
+    // os.WriteFile("temp.json", payload, os.ModePerm)
 
 	req, err := http.NewRequest("POST", DECODE_API_URL, bytes.NewReader(payload))
 	if err != nil {
