@@ -28,7 +28,7 @@ const PAULPLAYERTAG = "2YLCP0R8"
 func main() {
 	client := &http.Client{}
 	r := mux.NewRouter()
-	var alreadyProcessedBattleHashes map[string]struct{}
+    alreadyProcessedBattleHashes := make(map[string]struct{})
 
 	// Init the list with Paul playerTag
 	players := []string{PAULPLAYERTAG}
@@ -59,10 +59,12 @@ func createAddPlayerHandler(playerTags *[]string, alreadyProcessedBattleHashes m
 	    baseUrl := ROYALE_API_URL
 		log.Println("PlayerTag add request received")
 		vars := mux.Vars(r)
+        newPlayerTag := vars["tag"]
 
 		// Add already existing battles into cache
-		updateCurrentHistoryBattleHashes(client, baseUrl, (*playerTags)[0], alreadyProcessedBattleHashes)
-		*playerTags = append(*playerTags, vars["tag"])
+		updateCurrentHistoryBattleHashes(client, baseUrl, newPlayerTag, alreadyProcessedBattleHashes)
+
+		*playerTags = append(*playerTags, newPlayerTag)
 
 		w.WriteHeader(http.StatusOK)
 	}
