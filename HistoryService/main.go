@@ -16,6 +16,7 @@ import (
 
 const DEBUG_LOAD_BATTLES_FROM_FILE = false
 const DEBUG_LOSE_MODE = false
+const DEBUG_STILL_INCLUDE_HISTORICAL_BATTLES = false
 
 const ROYALE_API_URL = "https://proxy.royaleapi.dev/v1"
 const ENCODE_API_URL = "http://localhost:8000/encoding/encode"
@@ -59,13 +60,11 @@ func pollRoyaleApi(client *http.Client, ticker *time.Ticker) {
 
 	var alreadyProcessedBattleHashes map[string]struct{}
 
-	fmt.Println("Service about to start")
+	log.Println("Service about to start")
 
 	alreadyProcessedBattleHashes = getCurrentHistoryBattleHashes(client, baseUrl)
 
-	fmt.Println("Saved pre-existing battle hashes")
-
-	fmt.Println("Service running so swag")
+	log.Println("Service running so swag")
 
 	for {
 		select {
@@ -76,14 +75,20 @@ func pollRoyaleApi(client *http.Client, ticker *time.Ticker) {
 }
 
 func getCurrentHistoryBattleHashes(client *http.Client, baseUrl string) map[string]struct{} {
-	battles := requestPlayerBattleHistory(client, baseUrl)
+	if DEBUG_STILL_INCLUDE_HISTORICAL_BATTLES {
+		return make(map[string]struct{})
+	} else {
+		battles := requestPlayerBattleHistory(client, baseUrl)
 
-	currentBattleHashes := make(map[string]struct{})
-	for _, battle := range battles {
-		currentBattleHashes[getBattleHashId(battle)] = struct{}{}
+		currentBattleHashes := make(map[string]struct{})
+		for _, battle := range battles {
+			currentBattleHashes[getBattleHashId(battle)] = struct{}{}
+		}
+
+		log.Printf("Found %d pre-existing battles in history\n", len(currentBattleHashes))
+
+		return currentBattleHashes
 	}
-
-	return currentBattleHashes
 }
 
 func runIteration(alreadyProcessedBattleHashes map[string]struct{}, client *http.Client, baseUrl string) {
