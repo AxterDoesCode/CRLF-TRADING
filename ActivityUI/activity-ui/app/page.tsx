@@ -5,7 +5,7 @@ import TradingPortal from './components/TradingPortal';
 import ResultsPortal from './components/ResultsPortal';
 import { FinanceExample } from './src/FinanceExample';
 
-type Tab =  'stats' | 'market';
+type Tab = 'stats' | 'market';
 
 export default function Home() {
   const [refreshKey, setRefreshKey] = useState(0);
@@ -105,7 +105,7 @@ export default function Home() {
 
         {/* Floating Trading Portal */}
         <div
-          className={`fixed top-[0%] right-6 z-50 transition-transform duration-500 ease-in-out 
+          className={`fixed top-[0%] right-6 z-50 transition-transform duration-500 ease-in-out
         ${isTradingOpen ? 'translate-x-0' : 'translate-x-full'}
       `}
           style={{ width: '30%', height: '10%' }}
@@ -116,23 +116,23 @@ export default function Home() {
             className="cr-button absolute left-0 top-0 -translate-x-full text-white px-1 py-1 rounded-l-2xl shadow-2xl flex flex-col items-center gap-3"
             aria-label={isTradingOpen ? 'Close Trading Panel' : 'Open Trading Panel'}
           >
-          <div class='flex flex-row'>
-            <svg
-              className={`w-6 h-6 transition-transform duration-300 ${isTradingOpen ? 'rotate-0' : 'rotate-180'}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
-            </svg>
-            <div>
-              {!isTradingOpen ? 
-              'Open Trading':
-              'Close Trading'
-              }
-            </div>
+            <div className='flex flex-row'>
+              <svg
+                className={`w-6 h-6 transition-transform duration-300 ${isTradingOpen ? 'rotate-0' : 'rotate-180'}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+              </svg>
+              <div>
+                {!isTradingOpen ?
+                  'Open Trading' :
+                  'Close Trading'
+                }
+              </div>
 
-          </div>
+            </div>
           </button>
 
           {/* Trading Portal Panel */}
