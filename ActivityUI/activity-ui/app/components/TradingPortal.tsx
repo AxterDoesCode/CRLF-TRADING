@@ -98,7 +98,7 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Action Selection */}
         <div>
-          <label className="block text-sm font-bold text-yellow-300 mb-3 uppercase tracking-wide chewy-regulare">
+          <label className="block text-sm font-bold text-yellow-300 mb-3 uppercase tracking-wide chewy-regular">
             🎯 Battle Action
           </label>
           <div className="flex gap-4">

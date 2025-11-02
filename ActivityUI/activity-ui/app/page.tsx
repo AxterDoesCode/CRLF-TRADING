@@ -90,7 +90,7 @@ export default function Home() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              className="flex-1 px-6 py-4 bg-gradient-to-r from-slate-800 to-slate-900 border-2 border-yellow-500 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/50 font-bold text-lg transition-all"
+              className="flex-1 px-6 py-4 chewy-regular bg-gradient-to-r from-slate-800 to-slate-900 border-2 border-yellow-500 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/50 font-bold text-lg transition-all"
             />
             {inputValue && (
               <button
@@ -102,7 +102,7 @@ export default function Home() {
             )}
             <button
               onClick={handleSearch}
-              className="px-6 py-4 cr-button rounded-xl font-bold text-lg transition-all hover:scale-105"
+              className="px-6 py-4 chewy-regular cr-button rounded-xl font-bold text-lg transition-all hover:scale-105"
             >
               🔍 Search
             </button>
