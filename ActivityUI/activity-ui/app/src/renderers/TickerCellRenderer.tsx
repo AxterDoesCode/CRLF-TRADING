@@ -14,7 +14,7 @@ export const TickerCellRenderer: FunctionComponent<CustomCellRendererProps> = ({
         }}
       >
         <img
-          src={`/finance/logos/${data.ticker}.png`}
+          src={`/finance/logos/${data.ticker === "cash" ? "BTC-USD" : data.ticker}.png`}
           style={{
             width: "20px",
             height: "20px",

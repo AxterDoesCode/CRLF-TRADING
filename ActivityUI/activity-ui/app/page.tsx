@@ -36,7 +36,7 @@ export default function Home() {
           </div>
           <div className="pt-50">
             <h1 className="text-5xl font-bold text-white mb-2 cr-title">
-              ⚔️ C.R.F.D. TRADING ARENA ⚔️
+              ⚔️ C.R.L.F. TRADING ARENA ⚔️
             </h1>
             <p className="text-xl text-white cr-subtitle">
               🏆 Execute trades using legendary battle deck strategies 🏆
