@@ -171,7 +171,7 @@ func createPlayer(c *http.Client) error {
 		return err
 	}
     
-    os.WriteFile("player.json", payload, os.ModePerm)
+    // os.WriteFile("player.json", payload, os.ModePerm)
 
 	req, err := http.NewRequest("POST", TRADING_API_URL+"/player", bytes.NewReader(payload))
 	if err != nil {
@@ -204,8 +204,7 @@ func makeTrade(c *http.Client, trade TradeAction) error {
 		Symbol:   trade.Stock.Ticker,
 		Side:     side,
 		Quantity: int(trade.Stock.Shares),
-		T:        5,
-		// T:        time.Now().Unix(),
+        // T:        5,
 	}
 
 	payload, err := json.Marshal(tradeStruct)
@@ -213,6 +212,8 @@ func makeTrade(c *http.Client, trade TradeAction) error {
 		log.Println(err)
 		return err
 	}
+
+    // os.WriteFile("trade.json", payload, os.ModePerm)
 
 	req, err := http.NewRequest("POST", TRADING_API_URL+"/trade", bytes.NewReader(payload))
 	if err != nil {

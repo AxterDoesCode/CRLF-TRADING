@@ -102,7 +102,7 @@ type PlayerStruct struct {
 }
 
 type TradeStruct struct {
-	PlayerID string `json:"playerid"`
+	PlayerID string `json:"playerId"`
 	Symbol   string `json:"symbol"`
 	Side     string `json:"side"`
 	Quantity int    `json:"quantity"`
