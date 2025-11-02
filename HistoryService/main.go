@@ -169,8 +169,8 @@ func createPlayer(c *http.Client) error {
 		log.Println(err)
 		return err
 	}
-    
-    // os.WriteFile("player.json", payload, os.ModePerm)
+
+	// os.WriteFile("player.json", payload, os.ModePerm)
 
 	req, err := http.NewRequest("POST", TRADING_API_URL+"/player", bytes.NewReader(payload))
 	if err != nil {
@@ -179,12 +179,12 @@ func createPlayer(c *http.Client) error {
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-    res, err := c.Do(req)
+	res, err := c.Do(req)
 	if err != nil {
 		log.Println(err)
-        if res.StatusCode == http.StatusBadRequest {
-            return nil
-        }
+		if res.StatusCode == http.StatusBadRequest {
+			return nil
+		}
 		return err
 	}
 	return nil
@@ -197,22 +197,22 @@ func makeTrade(c *http.Client, trade TradeAction) error {
 	} else {
 		side = "sell"
 	}
-    fmt.Println("ticker", trade.Stock.Ticker)
-    fmt.Println("Side", side)
-    fmt.Println("Quantity", trade.Stock.Shares)
+	fmt.Println("ticker", trade.Stock.Ticker)
+	fmt.Println("Side", side)
+	fmt.Println("Quantity", trade.Stock.Shares)
 
 	now := time.Now()
-    // Get start of the day (midnight)
-    startOfDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
-    // Compute seconds since start of the day
-    secondsSinceStart := int(now.Sub(startOfDay).Seconds())
+	// Get start of the day (midnight)
+	startOfDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	// Compute seconds since start of the day
+	secondsSinceStart := int64(now.Sub(startOfDay).Seconds())
 
 	tradeStruct := TradeStruct{
 		PlayerID: PLAYERTAG,
 		Symbol:   trade.Stock.Ticker,
 		Side:     side,
 		Quantity: int(trade.Stock.Shares),
-        T:        secondsSinceStart,
+		T:        secondsSinceStart,
 	}
 
 	payload, err := json.Marshal(tradeStruct)
@@ -221,7 +221,7 @@ func makeTrade(c *http.Client, trade TradeAction) error {
 		return err
 	}
 
-    // os.WriteFile("trade.json", payload, os.ModePerm)
+	// os.WriteFile("trade.json", payload, os.ModePerm)
 
 	req, err := http.NewRequest("POST", TRADING_API_URL+"/trade", bytes.NewReader(payload))
 	if err != nil {
@@ -235,7 +235,7 @@ func makeTrade(c *http.Client, trade TradeAction) error {
 		log.Println(err)
 		return err
 	}
-    return nil
+	return nil
 }
 
 func getBattleHashId(battle Battle) string {
