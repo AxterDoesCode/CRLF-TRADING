@@ -15,7 +15,7 @@ import (
 )
 
 const DEBUG_LOAD_BATTLES_FROM_FILE = false
-const DEBUG_LOSE_MODE = true
+const DEBUG_LOSE_MODE = false
 const DEBUG_STILL_INCLUDE_HISTORICAL_BATTLES = false
 
 const ROYALE_API_URL = "https://proxy.royaleapi.dev/v1"

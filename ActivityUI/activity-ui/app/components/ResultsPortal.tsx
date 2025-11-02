@@ -31,7 +31,7 @@ interface ChartDataPoint {
   [key: string]: number; // For individual stock values
 }
 
-const STARTING_PORTFOLIO_VALUE = 1000; // $100k starting value
+const STARTING_PORTFOLIO_VALUE = 5000; // $100k starting value
 const MAX_CHART_POINTS = 60; // Keep last 60 data points
 
 // Define colors outside component to prevent recreation
