@@ -152,7 +152,6 @@ func processBattleHistory(client *http.Client, alreadyProcessedBattleHashes map[
 		err = createPlayer(client)
 		if err != nil {
 			log.Printf("Error creating player", err)
-			continue
 		}
 		err = makeTrade(client, actionToPerform)
 		if err != nil {
@@ -180,9 +179,12 @@ func createPlayer(c *http.Client) error {
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	_, err = c.Do(req)
+    res, err := c.Do(req)
 	if err != nil {
 		log.Println(err)
+        if res.StatusCode == http.StatusBadRequest {
+            return nil
+        }
 		return err
 	}
 	return nil
