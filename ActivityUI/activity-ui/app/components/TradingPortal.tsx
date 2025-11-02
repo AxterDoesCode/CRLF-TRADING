@@ -91,21 +91,21 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
 
   return (
     <div className="p-6 h-[100vh] center">
-      <h2 className="text-3xl font-bold mb-6 text-white cr-subtitle text-center">
+      <h2 className="text-3xl font-bold mb-6 text-white cr-subtitle text-center chewy-regular">
         ⚔️ BATTLE STATION ⚔️
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Action Selection */}
         <div>
-          <label className="block text-sm font-bold text-yellow-300 mb-3 uppercase tracking-wide">
+          <label className="block text-sm font-bold text-yellow-300 mb-3 uppercase tracking-wide chewy-regular">
             🎯 Battle Action
           </label>
           <div className="flex gap-4">
             <button
               type="button"
               onClick={() => setAction('Buy')}
-              className={`flex-1 py-3 px-4 font-black transition-all text-white ${action === 'Buy'
+              className={`flex-1 py-3 px-4 font-black transition-all text-white chewy-regular ${action === 'Buy'
                 ? 'cr-button-buy'
                 : 'bg-gray-600 hover:bg-gray-500 rounded-lg'
                 }`}
@@ -115,7 +115,7 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
             <button
               type="button"
               onClick={() => setAction('Sell')}
-              className={`flex-1 py-3 px-4 font-black transition-all text-white ${action === 'Sell'
+              className={`flex-1 py-3 px-4 font-black transition-all text-white chewy-regular ${action === 'Sell'
                 ? 'cr-button-sell'
                 : 'bg-gray-600 hover:bg-gray-500 rounded-lg'
                 }`}
@@ -127,7 +127,7 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
 
         {/* Company Name */}
         <div>
-          <label className="block text-sm font-bold text-yellow-300 mb-3 uppercase tracking-wide">
+          <label className="block text-sm font-bold text-yellow-300 mb-3 uppercase tracking-wide chewy-regular">
             🏢 Target Company
           </label>
           <input
@@ -158,7 +158,7 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
 
         {/* Amount */}
         <div>
-          <label className="block text-sm font-bold text-yellow-300 mb-3 uppercase tracking-wide">
+          <label className="block text-sm font-bold text-yellow-300 mb-3 uppercase tracking-wide chewy-regular">
             🔢 Amount (Units)
           </label>
           <input
@@ -175,7 +175,7 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
         <button
           type="submit"
           disabled={isSubmitting}
-          className={`w-full py-4 px-4 font-black text-white text-lg ${isSubmitting
+          className={`w-full py-4 px-4 font-black text-white text-lg chewy-regular ${isSubmitting
             ? 'bg-gray-500 cursor-not-allowed rounded-lg'
             : 'cr-button'
             }`}
@@ -186,7 +186,7 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
 
       {/* Message Display */}
       {message && (
-        <div className={`mt-5 p-4 rounded-xl font-bold text-center ${message.includes('Error')
+        <div className={`mt-5 p-4 rounded-xl font-bold text-center chewy-regular ${message.includes('Error')
           ? 'bg-red-900 text-red-100 border-2 border-red-600'
           : 'bg-green-900 text-green-100 border-2 border-green-500'
           }`}>
@@ -199,14 +199,14 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
           <button
             type="button"
             onClick={importDeck}
-            className="w-full py-4 px-4 font-black text-white text-lg cr-button-import"
+            className="w-full py-4 px-4 font-black text-white text-lg chewy-regular cr-button-import"
           >
             Import Deck
           </button>
           <button
             type="button"
             onClick={clearCard}
-            className="w-full mt-6 py-4 px-4 font-black text-white text-lg cr-button-reset"
+            className="w-full mt-6 py-4 px-4 font-black text-white text-lg chewy-regular cr-button-reset"
           >
             Clear Deck
           </button>
