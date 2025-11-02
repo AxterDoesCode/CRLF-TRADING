@@ -22,7 +22,6 @@ const ROYALE_API_URL = "https://proxy.royaleapi.dev/v1"
 const ENCODE_API_URL = "http://localhost:8000/encoding/encode"
 const DECODE_API_URL = "http://localhost:8000/encoding/decode"
 const TRADING_API_URL = "http://localhost:3003"
-
 const PLAYERTAGURI = "%232LGQJVR2C"
 const PLAYERTAG = "2LGQJVR2C"
 
