@@ -19,6 +19,9 @@ const DEBUG_LOSE_MODE = false
 const ROYALE_API_URL = "https://proxy.royaleapi.dev/v1"
 const ENCODE_API_URL = "http://localhost:8000/encoding/encode"
 const DECODE_API_URL = "http://localhost:8000/encoding/decode"
+const TRADING_API_URL = "http://localhost:3003"
+const PLAYERTAGURI = "%232YLCP0R8"
+const PLAYERTAG = "2YLCP0R8"
 
 func main() {
 	c := &http.Client{}
@@ -55,8 +58,8 @@ func requestPlayerBattleHistory(client *http.Client, baseUrl string) []Battle {
 	var battles []Battle
 
 	//%23 is a URL encoding for #
-	playerTag := "%232YLCP0R8"
-	url := fmt.Sprintf("%s/players/%s/battlelog", baseUrl, playerTag)
+	// playerTag := "%232YLCP0R8"
+	url := fmt.Sprintf("%s/players/%s/battlelog", baseUrl, PLAYERTAGURI)
 
 	var err error
 	var body []byte
@@ -146,7 +149,85 @@ func processBattleHistory(client *http.Client, alreadyProcessedBattleHashes map[
 		log.Printf("Decoded trade action: %+v\n", actionToPerform)
 
 		// TODO - Hit the trading service with the order
+		err = createPlayer(client)
+		if err != nil {
+			log.Printf("Error creating player", err)
+			continue
+		}
+		err = makeTrade(client, actionToPerform)
+		if err != nil {
+			log.Printf("Error making trade: %v\n", err)
+			continue
+		}
 	}
+}
+
+func createPlayer(c *http.Client) error {
+	player := PlayerStruct{PlayerID: PLAYERTAG}
+
+	payload, err := json.Marshal(player)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+    
+    // os.WriteFile("player.json", payload, os.ModePerm)
+
+	req, err := http.NewRequest("POST", TRADING_API_URL+"/player", bytes.NewReader(payload))
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	_, err = c.Do(req)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
+}
+
+func makeTrade(c *http.Client, trade TradeAction) error {
+	side := ""
+	if trade.Stock.Buy {
+		side = "buy"
+	} else {
+		side = "sell"
+	}
+    fmt.Println("ticker", trade.Stock.Ticker)
+    fmt.Println("Side", side)
+    fmt.Println("Quantity", trade.Stock.Shares)
+
+	tradeStruct := TradeStruct{
+		PlayerID: PLAYERTAG,
+		Symbol:   trade.Stock.Ticker,
+		Side:     side,
+		Quantity: int(trade.Stock.Shares),
+        // T:        5,
+	}
+
+	payload, err := json.Marshal(tradeStruct)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+    // os.WriteFile("trade.json", payload, os.ModePerm)
+
+	req, err := http.NewRequest("POST", TRADING_API_URL+"/trade", bytes.NewReader(payload))
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	_, err = c.Do(req)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+    return nil
 }
 
 func getBattleHashId(battle Battle) string {
@@ -171,7 +252,7 @@ func decodeDeck(c *http.Client, cards []Card) (TradeAction, error) {
 		return TradeAction{}, err
 	}
 
-    // os.WriteFile("temp.json", payload, os.ModePerm)
+	// os.WriteFile("temp.json", payload, os.ModePerm)
 
 	req, err := http.NewRequest("POST", DECODE_API_URL, bytes.NewReader(payload))
 	if err != nil {
@@ -208,6 +289,6 @@ func getTeamDeckCardIds(cards []Card) DeckStruct {
 		cardIds = append(cardIds, fmt.Sprintf("%d", card.ID))
 	}
 
-    deckStruct := DeckStruct{Deck: cardIds}
+	deckStruct := DeckStruct{Deck: cardIds}
 	return deckStruct
 }

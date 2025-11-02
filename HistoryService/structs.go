@@ -96,3 +96,15 @@ type TradeAction struct {
 type DeckStruct struct {
 	Deck []string `json:"deck"`
 }
+
+type PlayerStruct struct {
+	PlayerID string `json:"playerId"`
+}
+
+type TradeStruct struct {
+	PlayerID string `json:"playerId"`
+	Symbol   string `json:"symbol"`
+	Side     string `json:"side"`
+	Quantity int    `json:"quantity"`
+	T        int64  `json:"T"`
+}
