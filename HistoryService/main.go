@@ -15,7 +15,7 @@ import (
 )
 
 const DEBUG_LOAD_BATTLES_FROM_FILE = false
-const DEBUG_LOSE_MODE = false
+const DEBUG_LOSE_MODE = true
 const DEBUG_STILL_INCLUDE_HISTORICAL_BATTLES = false
 
 const ROYALE_API_URL = "https://proxy.royaleapi.dev/v1"
@@ -24,7 +24,7 @@ const DECODE_API_URL = "http://localhost:8000/encoding/decode"
 const TRADING_API_URL = "http://localhost:3003"
 
 const PLAYERTAGURI = "%232LGQJVR2C"
-const PLAYERTAG = "232LGQJVR2C"
+const PLAYERTAG = "2LGQJVR2C"
 
 func main() {
 	client := &http.Client{}
