@@ -32,7 +32,7 @@ app.post("/player", (req, res) => {
 
     players.set(playerId, {
         id: playerId,
-        virtual_balance: 100000.00,
+        virtual_balance: 1000.00,
         orders: [],
     });
 

@@ -83,7 +83,7 @@ export function usePortfolio(playerId: string) {
     console.log("Fetching portfolio for", playerId, "at time", currentTime);
 
     const { data, error, isLoading, mutate } = useSWR(
-        playerId ? `${BASE_URL}/portfolio/player_002?T=${currentTime}` : null,
+        playerId ? `${BASE_URL}/portfolio/2LGQJVR2C?T=${currentTime}` : null,
         fetcher,
         {
             refreshInterval: 1000,
