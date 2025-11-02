@@ -52,7 +52,7 @@ export default function Home() {
 
   const tabs = [
     { id: 'stats' as Tab, label: 'My Trading Stats', icon: '⚔️' },
-    { id: 'market' as Tab, label: 'Market Dashboard', icon: '👑' },
+    // { id: 'market' as Tab, label: 'Market Dashboard', icon: '👑' },
   ];
 
   return (
@@ -106,7 +106,7 @@ export default function Home() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="mb-6">
+        {/* <div className="mb-6">
           <div className="flex gap-3 justify-center">
             {tabs.map((tab) => (
               <button
@@ -123,7 +123,7 @@ export default function Home() {
               </button>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Tab Content */}
         <div
