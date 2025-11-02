@@ -2,8 +2,13 @@ import express from 'express';
 import { SIMULATION_CONFIG } from './config.js';
 import { calculatePrice, getPriceHistory } from './simulator.js';
 import { parse } from 'dotenv';
+import cors from 'cors';
 
 const app = express();
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
 app.use(express.json());
 
 const players = new Map();
