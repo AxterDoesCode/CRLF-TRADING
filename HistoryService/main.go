@@ -212,11 +212,12 @@ func processBattleHistory(client *http.Client, alreadyProcessedBattleHashes map[
 		log.Printf("Decoded trade action: %+v\n", actionToPerform)
 
 		// TODO - Hit the trading service with the order
-		err = createPlayer(client, team.Tag)
+        cleanTag := team.Tag[1:]
+		err = createPlayer(client, cleanTag)
 		if err != nil {
 			log.Printf("Error creating player", err)
 		}
-		err = makeTrade(client, actionToPerform, team.Tag)
+		err = makeTrade(client, actionToPerform, cleanTag)
 		if err != nil {
 			log.Printf("Error making trade: %v\n", err)
 			continue
