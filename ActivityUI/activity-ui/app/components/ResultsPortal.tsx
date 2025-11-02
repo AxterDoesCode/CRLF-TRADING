@@ -115,7 +115,7 @@ export default function ResultsPortal() {
 
     // Get the latest snapshot
     const latestSnapshot = portfolio[portfolio.length - 1];
-    
+
     // Check if we've already processed this timestamp
     if (latestSnapshot.timestamp === lastProcessedTimestamp.current) {
       return;
@@ -139,21 +139,21 @@ export default function ResultsPortal() {
 
     for (const key in latestSnapshot) {
       if (key === 'timestamp') continue;
-      
+
       const asset = latestSnapshot[key];
-      
+
       if (key === 'cash') {
         cashValue = asset.value;
       } else {
         // It's a stock
         const stockValue = asset.value;
         stocksValue += stockValue;
-        
+
         // Calculate P&L based on initial cost vs current value
         const purchasePrice = portfolio[0][key]?.price_per_share || asset.price_per_share;
         const profitLoss = asset.quantity * (asset.price_per_share - purchasePrice);
-        const profitLossPercent = purchasePrice > 0 
-          ? ((asset.price_per_share - purchasePrice) / purchasePrice) * 100 
+        const profitLossPercent = purchasePrice > 0
+          ? ((asset.price_per_share - purchasePrice) / purchasePrice) * 100
           : 0;
 
         calculatedPositions.push({
@@ -211,12 +211,12 @@ export default function ResultsPortal() {
       }
 
       const newData = [...prevData, newPoint];
-      
+
       // Keep only the last MAX_CHART_POINTS
       if (newData.length > MAX_CHART_POINTS) {
         return newData.slice(newData.length - MAX_CHART_POINTS);
       }
-      
+
       return newData;
     });
   }, [portfolio]);
@@ -238,16 +238,16 @@ export default function ResultsPortal() {
       />
       <Tooltip
         formatter={(value: number) => `$${value.toFixed(2)}`}
-        contentStyle={{ 
-          backgroundColor: '#2c3e50', 
-          border: '2px solid #f39c12', 
-          borderRadius: '8px', 
-          color: '#fff', 
-          fontWeight: 'bold' 
+        contentStyle={{
+          backgroundColor: '#2c3e50',
+          border: '2px solid #f39c12',
+          borderRadius: '8px',
+          color: '#fff',
+          fontWeight: 'bold'
         }}
       />
       <Legend />
-      
+
       {/* Total Portfolio Value */}
       <Line
         type="monotone"
@@ -258,7 +258,7 @@ export default function ResultsPortal() {
         name="Total Value"
         isAnimationActive={false}
       />
-      
+
       {/* Cash Line */}
       {/* <Line
         type="monotone"
@@ -269,7 +269,7 @@ export default function ResultsPortal() {
         name="Cash"
         isAnimationActive={false}
       /> */}
-      
+
       {/* Individual Stock Lines */}
       {/* {stockSymbols.map((symbol, index) => (
         <Line
@@ -289,8 +289,8 @@ export default function ResultsPortal() {
   return (
     <div className="h-full overflow-y-auto">
       <div className="mb-6">
-        <h2 className="text-3xl font-bold text-white cr-subtitle">💼 MY BATTLE PORTFOLIO 💼</h2>
-        <p className="text-yellow-300 text-sm mt-2 font-semibold">⚡ Real-time victory tracker ⚡</p>
+        <h2 className="text-3xl font-bold text-white cr-subtitle chewy-regular">💼 MY BATTLE PORTFOLIO 💼</h2>
+        <p className="text-yellow-300 text-sm mt-2 font-semibold chewy-regular">⚡ Real-time victory tracker ⚡</p>
       </div>
 
       {/* Profit & Loss Summary - Top Section */}

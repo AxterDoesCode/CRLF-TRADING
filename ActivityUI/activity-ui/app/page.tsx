@@ -4,6 +4,9 @@ import { useState } from 'react';
 import TradingPortal from './components/TradingPortal';
 import ResultsPortal from './components/ResultsPortal';
 import { FinanceExample } from './src/FinanceExample';
+import "@fontsource/luckiest-guy";
+import "@fontsource/bangers";
+import "@fontsource/chewy";
 
 type Tab = 'stats' | 'market';
 
@@ -35,10 +38,10 @@ export default function Home() {
             />
           </div>
           <div className="pt-50">
-            <h1 className="text-5xl font-bold text-white mb-2 cr-title">
+            <h1 className="text-5xl font-bold text-white mb-2 cr-title luckiest-guy-regular">
               ⚔️ C.R.L.F. TRADING ARENA ⚔️
             </h1>
-            <p className="text-xl text-white cr-subtitle">
+            <p className="text-xl text-white cr-subtitle bangers-regular">
               🏆 Execute trades using legendary battle deck strategies 🏆
             </p>
           </div>
@@ -51,7 +54,7 @@ export default function Home() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-8 py-4 font-black text-lg transition-all rounded-t-2xl relative ${activeTab === tab.id
+                className={`px-8 py-4 font-black text-lg transition-all rounded-t-2xl relative  chewy-regular ${activeTab === tab.id
                   ? 'cr-button text-white'
                   : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
                   }`}
@@ -82,10 +85,10 @@ export default function Home() {
             {activeTab === 'market' && (
               <>
                 <div className="mb-4 flex-shrink-0">
-                  <h2 className="text-3xl font-bold text-white cr-subtitle">
+                  <h2 className="text-3xl font-bold text-white cr-subtitle chewy-regular">
                     👑 ROYAL MARKET DASHBOARD 👑
                   </h2>
-                  <p className="text-yellow-300 text-sm mt-2 font-semibold">
+                  <p className="text-yellow-300 text-sm mt-2 chewy-regular">
                     ⚡ Real-time trading arena • All active securities ⚡
                   </p>
                 </div>
