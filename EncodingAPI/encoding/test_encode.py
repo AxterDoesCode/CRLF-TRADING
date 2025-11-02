@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any
 import itertools
 import pytest
 from . import encode
@@ -70,3 +70,15 @@ def test_encode_then_decode_inverse(buy, shares, ticker):
     assert (
         result["ticker"] == ticker
     ), f"Expected ticker={ticker}, got {result['ticker']}"
+
+
+@pytest.mark.parametrize(
+    "buy, shares, ticker",
+    list(itertools.product(BUY_VALUES, SHARES_VALUES, TICKER_VALUES)),
+)
+def test_encode_then_decode_then_encode(buy, shares, ticker):
+    deck = encode_trade(buy, shares, ticker)
+    result = decode_cards(deck)
+    reencoded = encode_trade(buy, shares, ticker)
+
+    assert reencoded == deck, f"Expected {deck}, got {reencoded}"
