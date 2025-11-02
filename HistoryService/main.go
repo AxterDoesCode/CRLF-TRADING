@@ -28,11 +28,12 @@ const PAULPLAYERTAG = "2YLCP0R8"
 func main() {
 	client := &http.Client{}
 	r := mux.NewRouter()
+	var alreadyProcessedBattleHashes map[string]struct{}
 
 	// Init the list with Paul playerTag
-	players := []string{"2YLCP0R8"}
-	r.HandleFunc("/addPlayer/{tag}", createAddPlayerHandler(&players))
-    http.Handle("/", r)
+	players := []string{PAULPLAYERTAG}
+	r.HandleFunc("/addPlayer/{tag}", createAddPlayerHandler(&players, alreadyProcessedBattleHashes, client))
+	http.Handle("/", r)
 
 	err := godotenv.Load()
 	if err != nil {
@@ -43,35 +44,36 @@ func main() {
 	// Poll royale API in a different thread
 	interval := 5 * time.Second
 	ticker := time.NewTicker(interval)
-	go pollRoyaleApi(client, ticker, &players)
+	go pollRoyaleApi(client, ticker, &players, alreadyProcessedBattleHashes)
 
 	// Start the Http server on the blocking thread
 	http.ListenAndServe(":8010", r)
 	defer fmt.Println("Main thread dead")
-	// Block the main thread
+	// Block the main threadyP
 	for {
 	}
 }
 
-func createAddPlayerHandler(playerTags *[]string) func(w http.ResponseWriter, r *http.Request) {
+func createAddPlayerHandler(playerTags *[]string, alreadyProcessedBattleHashes map[string]struct{}, client *http.Client) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-        log.Println("PlayerTag add request received")
-        vars := mux.Vars(r)
+	    baseUrl := ROYALE_API_URL
+		log.Println("PlayerTag add request received")
+		vars := mux.Vars(r)
 
+		// Add already existing battles into cache
+		updateCurrentHistoryBattleHashes(client, baseUrl, (*playerTags)[0], alreadyProcessedBattleHashes)
 		*playerTags = append(*playerTags, vars["tag"])
 
 		w.WriteHeader(http.StatusOK)
 	}
 }
 
-func pollRoyaleApi(client *http.Client, ticker *time.Ticker, playerTags *[]string) {
+func pollRoyaleApi(client *http.Client, ticker *time.Ticker, playerTags *[]string, alreadyProcessedBattleHashes map[string]struct{}) {
 	baseUrl := ROYALE_API_URL
-
-	var alreadyProcessedBattleHashes map[string]struct{}
 
 	log.Println("Service about to start")
 
-	alreadyProcessedBattleHashes = getCurrentHistoryBattleHashes(client, baseUrl)
+	updateCurrentHistoryBattleHashes(client, baseUrl, (*playerTags)[0], alreadyProcessedBattleHashes)
 
 	log.Println("Service running so swag")
 
@@ -79,27 +81,23 @@ func pollRoyaleApi(client *http.Client, ticker *time.Ticker, playerTags *[]strin
 		select {
 		case <-ticker.C:
 			for _, playerTag := range *playerTags {
-                runIteration(alreadyProcessedBattleHashes, client, baseUrl, playerTag)
+				runIteration(alreadyProcessedBattleHashes, client, baseUrl, playerTag)
 			}
 		}
 	}
 }
 
-func getCurrentHistoryBattleHashes(client *http.Client, baseUrl string) map[string]struct{} {
+func updateCurrentHistoryBattleHashes(client *http.Client, baseUrl string, playerTag string, processedBattleHashes map[string]struct{}) {
 	if DEBUG_STILL_INCLUDE_HISTORICAL_BATTLES {
-		return make(map[string]struct{})
+		return
 	} else {
-        // We are defaulting with Paul's account so I'm hardcoding this
-		battles := requestPlayerBattleHistory(client, baseUrl, PAULPLAYERTAG)
+		battles := requestPlayerBattleHistory(client, baseUrl, playerTag)
 
-		currentBattleHashes := make(map[string]struct{})
 		for _, battle := range battles {
-			currentBattleHashes[getBattleHashId(battle)] = struct{}{}
+			processedBattleHashes[getBattleHashId(battle)] = struct{}{}
 		}
 
-		log.Printf("Found %d pre-existing battles in history\n", len(currentBattleHashes))
-
-		return currentBattleHashes
+		log.Printf("Found %d pre-existing battles in history\n", len(processedBattleHashes))
 	}
 }
 
