@@ -19,8 +19,14 @@ tmux new-session -d -s $SESSION_NAME -n services "make history_service"
 # Split window horizontally and run trading_api
 tmux split-window -h -t $SESSION_NAME:0 "make trading_api"
 
-# Split the right pane vertically and run encoding_api
-tmux split-window -v -t $SESSION_NAME:0.1 "make encoding_api"
+# Split the left pane vertically and run encoding_api
+tmux split-window -v -t $SESSION_NAME:0.0 "make encoding_api"
+
+# Split the right pane vertically and run activity_ui
+tmux split-window -v -t $SESSION_NAME:0.2 "make activity_ui"
+
+# Use tiled layout to make all panes equal size
+tmux select-layout -t $SESSION_NAME:0 tiled
 
 # Attach to the session
 tmux attach-session -t $SESSION_NAME
