@@ -1,10 +1,8 @@
-// import { AgChartsEnterpriseModule } from "ag-charts-enterprise";
 import React, {
   useCallback,
-  useEffect,
   useMemo,
   useRef,
-  useState,
+  useEffect,
 } from "react";
 
 import {
@@ -38,20 +36,18 @@ import {
 import { AgGridReact } from "ag-grid-react";
 
 import styles from "./FinanceExample.module.css";
-import { getData } from "./data";
 import { TickerCellRenderer } from "./renderers/TickerCellRenderer";
 import { sparklineTooltipRenderer } from "./renderers/sparklineTooltipRenderer";
 import { AgChartsEnterpriseModule } from "ag-charts-enterprise";
+import { usePortfolio } from "../api/tradingapi/api";
 
 export interface Props {
   gridTheme?: string;
   isDarkMode?: boolean;
   gridHeight?: number | null;
-  updateInterval?: number;
+  playerId: string;
+  currentTime: number;
 }
-
-const DEFAULT_UPDATE_INTERVAL = 60;
-const PERCENTAGE_CHANGE = 20;
 
 ModuleRegistry.registerModules([
   AllCommunityModule,
@@ -68,7 +64,6 @@ ModuleRegistry.registerModules([
   SetFilterModule,
   RichSelectModule,
   StatusBarModule,
-  // IntegratedChartsModule.with(AgChartsEnterpriseModule),
   SparklinesModule.with(AgChartsEnterpriseModule)
 ]);
 
@@ -84,43 +79,57 @@ export const FinanceExample: React.FC<Props> = ({
   gridTheme = "ag-theme-quartz",
   isDarkMode = false,
   gridHeight = null,
-  updateInterval = DEFAULT_UPDATE_INTERVAL,
+  playerId,
+  currentTime,
 }) => {
-  const [rowData, setRowData] = useState(getData());
+  const { rowData } = usePortfolio("player_002");
   const gridRef = useRef<AgGridReact>(null);
+  const previousRowDataRef = useRef<any[]>([]);
 
+  // Use transactions to update data smoothly instead of replacing all rows
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setRowData((rowData) =>
-        rowData.map((item) => {
-          const isRandomChance = Math.random() < 0.1;
+    if (!gridRef.current || !rowData) return;
 
-          if (!isRandomChance) {
-            return item;
-          }
-          const rnd = (Math.random() * PERCENTAGE_CHANGE) / 100;
-          const change = Math.random() > 0.5 ? 1 - rnd : 1 + rnd;
-          const price =
-            item.price < 10
-              ? item.price * change
-              : // Increase price if it is too low, so it does not hang around 0
-              Math.random() * 40 + 10;
+    const api = gridRef.current.api;
+    if (!api) return;
 
-          const timeline = item.timeline
-            .slice(1, item.timeline.length)
-            .concat(Number(price.toFixed(2)));
+    // On first load, set the data normally
+    if (previousRowDataRef.current.length === 0) {
+      previousRowDataRef.current = rowData;
+      return;
+    }
 
-          return {
-            ...item,
-            price,
-            timeline,
-          };
-        })
+    // For updates, use transactions
+    const updates = rowData.filter(newRow => {
+      const oldRow = previousRowDataRef.current.find(r => r.ticker === newRow.ticker);
+      if (!oldRow) return false;
+      
+      // Check if any values changed
+      return (
+        oldRow.price !== newRow.price ||
+        oldRow.quantity !== newRow.quantity ||
+        JSON.stringify(oldRow.timeline) !== JSON.stringify(newRow.timeline)
       );
-    }, updateInterval);
+    });
 
-    return () => clearInterval(intervalId);
-  }, [updateInterval]);
+    const adds = rowData.filter(newRow => 
+      !previousRowDataRef.current.find(r => r.ticker === newRow.ticker)
+    );
+
+    const removes = previousRowDataRef.current.filter(oldRow =>
+      !rowData.find(r => r.ticker === oldRow.ticker)
+    );
+
+    if (updates.length > 0 || adds.length > 0 || removes.length > 0) {
+      api.applyTransaction({
+        update: updates,
+        add: adds,
+        remove: removes,
+      });
+    }
+
+    previousRowDataRef.current = rowData;
+  }, [rowData]);
 
   const colDefs = useMemo<ColDef[]>(() => {
     return [
@@ -162,7 +171,7 @@ export const FinanceExample: React.FC<Props> = ({
         type: "rightAligned",
         cellRenderer: "agAnimateShowChangeCellRenderer",
         valueGetter: ({ data }: ValueGetterParams) =>
-          data && data.quantity * (data.price / data.purchasePrice),
+          data && data.quantity * (data.price - data.purchasePrice),
         valueFormatter: numberFormatter,
         aggFunc: "sum",
         minWidth: 140,
@@ -191,6 +200,7 @@ export const FinanceExample: React.FC<Props> = ({
       filter: true,
       enableRowGroup: true,
       enableValue: true,
+      enableCellChangeFlash: true, // Enable cell flash animation on value change
     }),
     []
   );
@@ -216,6 +226,10 @@ export const FinanceExample: React.FC<Props> = ({
   const themeClass = `${gridTheme}${isDarkMode ? "-dark" : ""}`;
   const chartThemes = isDarkMode ? ["ag-default-dark"] : ["ag-default"];
 
+  if (!rowData) {
+    return <div className={styles.loading}>Loading portfolio...</div>;
+  }
+
   return (
     <div
       style={{ height: '100%' }}
@@ -226,7 +240,7 @@ export const FinanceExample: React.FC<Props> = ({
         chartThemes={chartThemes}
         ref={gridRef}
         getRowId={getRowId}
-        rowData={rowData}
+        rowData={previousRowDataRef.current.length === 0 ? rowData : undefined}
         columnDefs={colDefs}
         defaultColDef={defaultColDef}
         cellSelection={true}
@@ -235,6 +249,7 @@ export const FinanceExample: React.FC<Props> = ({
         suppressAggFuncInHeader
         groupDefaultExpanded={-1}
         statusBar={statusBar}
+        animateRows={true}
       />
     </div>
   );

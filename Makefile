@@ -24,6 +24,9 @@ history_service: go
 trading_api: npm
 	cd TradingAPI && npm install && node index.js
 
+activity_ui: npm
+	cd ActivityUI/activity-ui && npm install && npm run dev
+
 test: test_encoding_api
 
 run: python go npm

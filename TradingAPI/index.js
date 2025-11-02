@@ -2,8 +2,13 @@ import express from 'express';
 import { SIMULATION_CONFIG } from './config.js';
 import { calculatePrice, getPriceHistory } from './simulator.js';
 import { parse } from 'dotenv';
+import cors from 'cors';
 
 const app = express();
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
 app.use(express.json());
 
 const players = new Map();
@@ -27,7 +32,7 @@ app.post("/player", (req, res) => {
 
     players.set(playerId, {
         id: playerId,
-        virtual_balance: 100000.00,
+        virtual_balance: 5000.00,
         orders: [],
     });
 
