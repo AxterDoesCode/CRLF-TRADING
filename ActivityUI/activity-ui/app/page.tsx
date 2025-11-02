@@ -5,7 +5,7 @@ import TradingPortal from './components/TradingPortal';
 import ResultsPortal from './components/ResultsPortal';
 import { FinanceExample } from './src/FinanceExample';
 
-type Tab =  'stats' | 'market';
+type Tab = 'stats' | 'market';
 
 export default function Home() {
   const [refreshKey, setRefreshKey] = useState(0);
@@ -116,28 +116,28 @@ export default function Home() {
             className="cr-button absolute left-0 top-0 -translate-x-full text-white px-1 py-1 rounded-l-2xl shadow-2xl flex flex-col items-center gap-3"
             aria-label={isTradingOpen ? 'Close Trading Panel' : 'Open Trading Panel'}
           >
-          <div class='flex flex-row'>
-            <svg
-              className={`w-6 h-6 transition-transform duration-300 ${isTradingOpen ? 'rotate-0' : 'rotate-180'}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
-            </svg>
-            <div>
-              {!isTradingOpen ? 
-              'Open Trading':
-              'Close Trading'
-              }
-            </div>
+            <div className='flex flex-row'>
+              <svg
+                className={`w-6 h-6 transition-transform duration-300 ${isTradingOpen ? 'rotate-0' : 'rotate-180'}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+              </svg>
+              <div>
+                {!isTradingOpen ?
+                  'Open Trading' :
+                  'Close Trading'
+                }
+              </div>
 
-          </div>
+            </div>
           </button>
 
           {/* Trading Portal Panel */}
           <div
-            className="cr-stats-panel shadow-2xl rounded-2xl overflow-hidden max-h-[calc(100vh)] overflow-y-auto relative"
+            className="cr-stats-panel shadow-2xl rounded-2xl overflow-hidden overflow-y-auto relative"
             style={{
               backgroundImage: 'url(/res/Spending_the_Loot.png)',
               backgroundSize: 'cover',

@@ -13,9 +13,11 @@
     "ag-grid-community": "^34.3.1",
     "ag-grid-enterprise": "^34.3.1",
     "ag-grid-react": "^34.3.1",
+    "framer-motion": "^12.23.24",
     "next": "16.0.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",
+    "react-qr-code": "^2.0.18",
     "recharts": "^3.3.0"
   },
   "devDependencies": {
