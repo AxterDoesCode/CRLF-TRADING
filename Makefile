@@ -1,4 +1,4 @@
-.PHONY: npm python go activity_ui encoding_api test_encoding_api history_service trading_api test
+.PHONY: npm python go activity_ui encoding_api test_encoding_api history_service trading_api test run
 
 npm:
 	npm --version
@@ -25,3 +25,6 @@ trading_api: npm
 	cd TradingAPI && npm install && node index.js
 
 test: test_encoding_api
+
+run: python go npm
+	bash start-services.sh
