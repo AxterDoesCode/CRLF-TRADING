@@ -43,7 +43,7 @@ func main() {
 	go pollRoyaleApi(c, ticker)
 
 	// Start the Http server on the blocking thread
-	http.ListenAndServe(":0010", r)
+	http.ListenAndServe(":8010", r)
     defer fmt.Println("Main thread dead")
     // Block the main thread
     for{}
