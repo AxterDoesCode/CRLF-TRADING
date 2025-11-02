@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-
+import QRCode from "react-qr-code";
+import { clear } from 'console';
 interface TradingPortalProps {
   onTradeSubmitted: () => void;
 }
@@ -32,23 +33,32 @@ function getDeckUrl(deck: string[]) {
 
 export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) {
   const [action, setAction] = useState<'Buy' | 'Sell'>('Buy');
-  const [price, setPrice] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [amount, setAmount] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [clashRoyaleDeck, setClashRoyaleDeck] = useState<string[]>([]);
   const [message, setMessage] = useState('');
+  const [qrVisible, setQrVisible] = useState(false);
+  const [deckVisible, setDeckVisible] = useState(false);
+  const [url, setUrl] = useState("")
 
   const clearCard = () => {
     setClashRoyaleDeck([]);
   };
 
+  const importDeck = () => {
+    setQrVisible(true);
+    setDeckVisible(false);
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setMessage('');
     setClashRoyaleDeck([]);
+    setQrVisible(false);
+    setDeckVisible(true);
+    setUrl("");
 
     try {
       // Step 1: Translate to Clash Royale deck
@@ -70,36 +80,8 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
       console.log(translatorData)
 
       setClashRoyaleDeck(translatorData.clashRoyaleDeck.deck_encoding);
-      // setClashRoyaleDeck([1, 2, 3, 4, 6, 9, 10, 11])
-      // Step 2: Execute trade with Clash Royale deck
-      // const tradingResponse = await fetch('/api/trading', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     action,
-      //     price: parseFloat(price),
-      //     companyName,
-      //     amount: parseInt(amount),
-      //     clashRoyaleDeck: translatorData.clashRoyaleDeck
-      //   })
-      // });
+      setUrl(getDeckUrl(translatorData.clashRoyaleDeck.deck_encoding))
 
-      // const tradingData = await tradingResponse.json();
-
-      // if (tradingData.success) {
-      //   setMessage(`Trade #${tradingData.tradeId} submitted! Estimated execution time: ${(tradingData.estimatedTime / 1000).toFixed(1)}s`);
-
-      //   // Reset form after successful submission
-      //   setTimeout(() => {
-      //     setPrice('');
-      //     setCompanyName('');
-      //     setAmount('');
-      //     setClashRoyaleDeck(null);
-      //     onTradeSubmitted();
-      //   }, 2000);
-      // } else {
-      //   throw new Error('Failed to execute trade');
-      // }
     } catch (error) {
       setMessage('Error: Failed to submit trade. Please try again.');
     } finally {
@@ -108,7 +90,7 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
   };
 
   return (
-    <div className="p-6 h-[95vh]">
+    <div className="p-6 h-[100vh] center">
       <h2 className="text-3xl font-bold mb-6 text-white cr-subtitle text-center">
         ⚔️ BATTLE STATION ⚔️
       </h2>
@@ -200,13 +182,6 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
         >
           {isSubmitting ? '⏳ DEPLOYING DECK...' : '⚡ DEPLOY & BATTLE ⚡'}
         </button>
-        <button
-          type="button"
-          onClick={clearCard}
-          className="w-full py-4 px-4 font-black text-white text-lg cr-button-reset"
-        >
-          Clear Deck
-        </button>
       </form>
 
       {/* Message Display */}
@@ -220,23 +195,59 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
       )}
 
       {clashRoyaleDeck.length > 0 && (
-        <div className="grid grid-cols-4 gap-4 mt-8">
-          {clashRoyaleDeck.map((cardId, index) => (
+        <div className='mt-6'>
+          <button
+            type="button"
+            onClick={importDeck}
+            className="w-full py-4 px-4 font-black text-white text-lg cr-button-import"
+          >
+            Import Deck
+          </button>
+          <button
+            type="button"
+            onClick={clearCard}
+            className="w-full mt-6 py-4 px-4 font-black text-white text-lg cr-button-reset"
+          >
+            Clear Deck
+          </button>
+          {deckVisible &&
+            (<div className="grid grid-cols-4 gap-4 mt-8">
+              {clashRoyaleDeck.map((cardId, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 50, rotateY: 180 }}
+                  animate={{ opacity: 1, y: 0, rotateY: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  className="bg-gradient-to-br from-yellow-600 to-orange-800 rounded-xl p-2 shadow-lg hover:scale-105 transform transition-all"
+                >
+                  <img
+                    src={cardImages[cardId]}
+                    alt={`Card ${cardId}`}
+                    className="rounded-lg w-full object-cover"
+                  />
+                </motion.div>
+              ))
+              }
+            </div>)
+          }
+          {url && qrVisible && (
             <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 50, rotateY: 180 }}
-              animate={{ opacity: 1, y: 0, rotateY: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="bg-gradient-to-br from-yellow-600 to-orange-800 rounded-xl p-2 shadow-lg hover:scale-105 transform transition-all"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{
+                duration: 0.4,
+                ease: "easeOut"
+              }}
+              className="flex w-full h-full justify-center items-center bg-gradient-to-br from-yellow-600 to-orange-800 rounded-xl p-2 shadow-lg hover:scale-105 transform transition-all qr-wrapper"
             >
-              <img
-                src={cardImages[cardId]}
-                alt={`Card ${cardId}`}
-                className="rounded-lg w-full object-cover"
+              <QRCode
+                value={url}
+                size={256}
               />
             </motion.div>
-          ))}
+          )}
         </div>
-      )}
-    </div>);
+      )
+      }
+    </div >);
 }
