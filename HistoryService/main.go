@@ -23,14 +23,16 @@ const ENCODE_API_URL = "http://localhost:8000/encoding/encode"
 const DECODE_API_URL = "http://localhost:8000/encoding/decode"
 const TRADING_API_URL = "http://localhost:3003"
 
-const PLAYERTAGURI = "%232YLCP0R8"
-const PLAYERTAG = "2YLCP0R8"
+const PAULPLAYERTAG = "2YLCP0R8"
 
 func main() {
 	client := &http.Client{}
 	r := mux.NewRouter()
 
-	r.HandleFunc("/addPlayer", addPlayerHandler)
+	// Init the list with Paul playerTag
+	players := []string{"2YLCP0R8"}
+	r.HandleFunc("/addPlayer/{tag}", createAddPlayerHandler(&players))
+    http.Handle("/", r)
 
 	err := godotenv.Load()
 	if err != nil {
@@ -41,7 +43,7 @@ func main() {
 	// Poll royale API in a different thread
 	interval := 5 * time.Second
 	ticker := time.NewTicker(interval)
-	go pollRoyaleApi(client, ticker)
+	go pollRoyaleApi(client, ticker, &players)
 
 	// Start the Http server on the blocking thread
 	http.ListenAndServe(":8010", r)
@@ -51,11 +53,18 @@ func main() {
 	}
 }
 
-func addPlayerHandler(w http.ResponseWriter, r *http.Request) {
+func createAddPlayerHandler(playerTags *[]string) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+        log.Println("PlayerTag add request received")
+        vars := mux.Vars(r)
 
+		*playerTags = append(*playerTags, vars["tag"])
+
+		w.WriteHeader(http.StatusOK)
+	}
 }
 
-func pollRoyaleApi(client *http.Client, ticker *time.Ticker) {
+func pollRoyaleApi(client *http.Client, ticker *time.Ticker, playerTags *[]string) {
 	baseUrl := ROYALE_API_URL
 
 	var alreadyProcessedBattleHashes map[string]struct{}
@@ -69,7 +78,9 @@ func pollRoyaleApi(client *http.Client, ticker *time.Ticker) {
 	for {
 		select {
 		case <-ticker.C:
-			runIteration(alreadyProcessedBattleHashes, client, baseUrl)
+			for _, playerTag := range *playerTags {
+                runIteration(alreadyProcessedBattleHashes, client, baseUrl, playerTag)
+			}
 		}
 	}
 }
@@ -78,7 +89,8 @@ func getCurrentHistoryBattleHashes(client *http.Client, baseUrl string) map[stri
 	if DEBUG_STILL_INCLUDE_HISTORICAL_BATTLES {
 		return make(map[string]struct{})
 	} else {
-		battles := requestPlayerBattleHistory(client, baseUrl)
+        // We are defaulting with Paul's account so I'm hardcoding this
+		battles := requestPlayerBattleHistory(client, baseUrl, PAULPLAYERTAG)
 
 		currentBattleHashes := make(map[string]struct{})
 		for _, battle := range battles {
@@ -91,18 +103,18 @@ func getCurrentHistoryBattleHashes(client *http.Client, baseUrl string) map[stri
 	}
 }
 
-func runIteration(alreadyProcessedBattleHashes map[string]struct{}, client *http.Client, baseUrl string) {
-	battles := requestPlayerBattleHistory(client, baseUrl)
+func runIteration(alreadyProcessedBattleHashes map[string]struct{}, client *http.Client, baseUrl string, playerTag string) {
+	battles := requestPlayerBattleHistory(client, baseUrl, playerTag)
 
 	processBattleHistory(client, alreadyProcessedBattleHashes, battles)
 }
 
-func requestPlayerBattleHistory(client *http.Client, baseUrl string) []Battle {
+func requestPlayerBattleHistory(client *http.Client, baseUrl string, playerTag string) []Battle {
 	var battles []Battle
 
 	//%23 is a URL encoding for #
-	// playerTag := "%232YLCP0R8"
-	url := fmt.Sprintf("%s/players/%s/battlelog", baseUrl, PLAYERTAGURI)
+	playerTagUri := "%23" + playerTag
+	url := fmt.Sprintf("%s/players/%s/battlelog", baseUrl, playerTagUri)
 
 	var err error
 	var body []byte
@@ -200,11 +212,11 @@ func processBattleHistory(client *http.Client, alreadyProcessedBattleHashes map[
 		log.Printf("Decoded trade action: %+v\n", actionToPerform)
 
 		// TODO - Hit the trading service with the order
-		err = createPlayer(client)
+		err = createPlayer(client, team.Tag)
 		if err != nil {
 			log.Printf("Error creating player", err)
 		}
-		err = makeTrade(client, actionToPerform)
+		err = makeTrade(client, actionToPerform, team.Tag)
 		if err != nil {
 			log.Printf("Error making trade: %v\n", err)
 			continue
@@ -212,8 +224,8 @@ func processBattleHistory(client *http.Client, alreadyProcessedBattleHashes map[
 	}
 }
 
-func createPlayer(c *http.Client) error {
-	player := PlayerStruct{PlayerID: PLAYERTAG}
+func createPlayer(c *http.Client, playerTag string) error {
+	player := PlayerStruct{PlayerID: playerTag}
 
 	payload, err := json.Marshal(player)
 	if err != nil {
@@ -241,7 +253,7 @@ func createPlayer(c *http.Client) error {
 	return nil
 }
 
-func makeTrade(c *http.Client, trade TradeAction) error {
+func makeTrade(c *http.Client, trade TradeAction, playerTag string) error {
 	side := ""
 	if trade.Stock.Buy {
 		side = "buy"
@@ -259,7 +271,7 @@ func makeTrade(c *http.Client, trade TradeAction) error {
 	secondsSinceStart := int64(now.Sub(startOfDay).Seconds())
 
 	tradeStruct := TradeStruct{
-		PlayerID: PLAYERTAG,
+		PlayerID: playerTag,
 		Symbol:   trade.Stock.Ticker,
 		Side:     side,
 		Quantity: int(trade.Stock.Shares),
