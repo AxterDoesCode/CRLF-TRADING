@@ -40,6 +40,7 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
   const [message, setMessage] = useState('');
   const [qrVisible, setQrVisible] = useState(false);
   const [deckVisible, setDeckVisible] = useState(false);
+  const [url, setUrl] = useState("")
 
   const clearCard = () => {
     setClashRoyaleDeck([]);
@@ -57,6 +58,7 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
     setClashRoyaleDeck([]);
     setQrVisible(false);
     setDeckVisible(true);
+    setUrl("");
 
     try {
       // Step 1: Translate to Clash Royale deck
@@ -78,6 +80,7 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
       console.log(translatorData)
 
       setClashRoyaleDeck(translatorData.clashRoyaleDeck.deck_encoding);
+      setUrl(getDeckUrl(translatorData.clashRoyaleDeck.deck_encoding))
 
     } catch (error) {
       setMessage('Error: Failed to submit trade. Please try again.');
@@ -227,7 +230,7 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
               }
             </div>)
           }
-          {qrVisible && (
+          {url && qrVisible && (
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -238,9 +241,7 @@ export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) 
               className="flex w-full h-full justify-center items-center bg-gradient-to-br from-yellow-600 to-orange-800 rounded-xl p-2 shadow-lg hover:scale-105 transform transition-all qr-wrapper"
             >
               <QRCode
-                value={
-                  "https://link.clashroyale.com/en/?clashroyale://copyDeck?deck=26000047;26000049;26000018;26000011;26000041;26000022;26000053;26000059&l=Royals"
-                }
+                value={url}
                 size={256}
               />
             </motion.div>
