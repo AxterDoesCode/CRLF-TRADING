@@ -199,12 +199,18 @@ func makeTrade(c *http.Client, trade TradeAction) error {
     fmt.Println("Side", side)
     fmt.Println("Quantity", trade.Stock.Shares)
 
+	now := time.Now()
+    // Get start of the day (midnight)
+    startOfDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+    // Compute seconds since start of the day
+    secondsSinceStart := int(now.Sub(startOfDay).Seconds())
+
 	tradeStruct := TradeStruct{
 		PlayerID: PLAYERTAG,
 		Symbol:   trade.Stock.Ticker,
 		Side:     side,
 		Quantity: int(trade.Stock.Shares),
-        // T:        5,
+        T:        secondsSinceStart,
 	}
 
 	payload, err := json.Marshal(tradeStruct)
