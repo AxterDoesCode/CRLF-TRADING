@@ -26,6 +26,9 @@ const cardImages: Record<string, string> = {
   "26000011": "/res/valkyrie.png",
 };
 
+function getDeckUrl(deck: string[]) {
+  return `clashroyale://copyDeck?deck=${deck.join(';')}&l=Royals&slots=0;0;0;0;0;0;0;0&tt=159000000`;
+}
 
 export default function TradingPortal({ onTradeSubmitted }: TradingPortalProps) {
   const [action, setAction] = useState<'Buy' | 'Sell'>('Buy');
