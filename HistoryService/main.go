@@ -14,17 +14,17 @@ import (
 )
 
 const DEBUG_LOAD_BATTLES_FROM_FILE = false
-const DEBUG_LOSE_MODE = false
+const DEBUG_LOSE_MODE = true
 
 const ROYALE_API_URL = "https://proxy.royaleapi.dev/v1"
 const ENCODE_API_URL = "http://localhost:8000/encoding/encode"
 const DECODE_API_URL = "http://localhost:8000/encoding/decode"
 const TRADING_API_URL = "http://localhost:3003"
-const PLAYERTAGURI = "%232YLCP0R8"
-const PLAYERTAG = "2YLCP0R8"
+const PLAYERTAGURI = "%232LGQJVR2C"
+const PLAYERTAG = "2LGQJVR2C"
 
 func main() {
-	c := &http.Client{}
+	c := &http.Client{}	
 	baseUrl := ROYALE_API_URL
 
 	err := godotenv.Load()
@@ -206,6 +206,8 @@ func makeTrade(c *http.Client, trade TradeAction) error {
 	startOfDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 	// Compute seconds since start of the day
 	secondsSinceStart := int64(now.Sub(startOfDay).Seconds())
+
+	fmt.Println("T", secondsSinceStart)
 
 	tradeStruct := TradeStruct{
 		PlayerID: PLAYERTAG,

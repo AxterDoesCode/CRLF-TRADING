@@ -31,14 +31,14 @@ interface ChartDataPoint {
   [key: string]: number; // For individual stock values
 }
 
-const STARTING_PORTFOLIO_VALUE = 100000; // $100k starting value
+const STARTING_PORTFOLIO_VALUE = 1000; // $100k starting value
 const MAX_CHART_POINTS = 60; // Keep last 60 data points
 
 // Define colors outside component to prevent recreation
 const STOCK_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
 export default function ResultsPortal() {
-  const { portfolio, isLoading } = usePortfolio('player_002');
+  const { portfolio, isLoading } = usePortfolio('2LGQJVR2C');
   const [positions, setPositions] = useState<Position[]>([]);
   const [profitLoss, setProfitLoss] = useState<ProfitLoss | null>(null);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
@@ -253,36 +253,36 @@ export default function ResultsPortal() {
         type="monotone"
         dataKey="totalValue"
         stroke="#f39c12"
-        strokeWidth={4}
+        strokeWidth={1}
         dot={false}
         name="Total Value"
         isAnimationActive={false}
       />
       
       {/* Cash Line */}
-      <Line
+      {/* <Line
         type="monotone"
         dataKey="cash"
         stroke="#60a5fa"
-        strokeWidth={2}
+        strokeWidth={1}
         dot={false}
         name="Cash"
         isAnimationActive={false}
-      />
+      /> */}
       
       {/* Individual Stock Lines */}
-      {stockSymbols.map((symbol, index) => (
+      {/* {stockSymbols.map((symbol, index) => (
         <Line
           key={symbol}
           type="monotone"
           dataKey={symbol}
           stroke={STOCK_COLORS[index % STOCK_COLORS.length]}
-          strokeWidth={2}
+          strokeWidth={1}
           dot={false}
           name={symbol}
           isAnimationActive={false}
         />
-      ))}
+      ))} */}
     </LineChart>
   ), [chartData, stockSymbols]);
 
