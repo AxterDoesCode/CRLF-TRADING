@@ -16,6 +16,7 @@ import (
 
 const DEBUG_LOAD_BATTLES_FROM_FILE = false
 const DEBUG_LOSE_MODE = false
+const DEBUG_STILL_INCLUDE_HISTORICAL_BATTLES = false
 
 const ROYALE_API_URL = "https://proxy.royaleapi.dev/v1"
 const ENCODE_API_URL = "http://localhost:8000/encoding/encode"
@@ -26,7 +27,7 @@ const PLAYERTAGURI = "%232YLCP0R8"
 const PLAYERTAG = "2YLCP0R8"
 
 func main() {
-	c := &http.Client{}
+	client := &http.Client{}
 	r := mux.NewRouter()
 
 	r.HandleFunc("/addPlayer", addPlayerHandler)
@@ -40,13 +41,14 @@ func main() {
 	// Poll royale API in a different thread
 	interval := 5 * time.Second
 	ticker := time.NewTicker(interval)
-	go pollRoyaleApi(c, ticker)
+	go pollRoyaleApi(client, ticker)
 
 	// Start the Http server on the blocking thread
 	http.ListenAndServe(":8010", r)
-    defer fmt.Println("Main thread dead")
-    // Block the main thread
-    for{}
+	defer fmt.Println("Main thread dead")
+	// Block the main thread
+	for {
+	}
 }
 
 func addPlayerHandler(w http.ResponseWriter, r *http.Request) {
@@ -55,15 +57,37 @@ func addPlayerHandler(w http.ResponseWriter, r *http.Request) {
 
 func pollRoyaleApi(client *http.Client, ticker *time.Ticker) {
 	baseUrl := ROYALE_API_URL
-	alreadyProcessedBattleHashes := make(map[string]struct{})
 
-	fmt.Println("Service running so swag")
+	var alreadyProcessedBattleHashes map[string]struct{}
+
+	log.Println("Service about to start")
+
+	alreadyProcessedBattleHashes = getCurrentHistoryBattleHashes(client, baseUrl)
+
+	log.Println("Service running so swag")
 
 	for {
 		select {
 		case <-ticker.C:
 			runIteration(alreadyProcessedBattleHashes, client, baseUrl)
 		}
+	}
+}
+
+func getCurrentHistoryBattleHashes(client *http.Client, baseUrl string) map[string]struct{} {
+	if DEBUG_STILL_INCLUDE_HISTORICAL_BATTLES {
+		return make(map[string]struct{})
+	} else {
+		battles := requestPlayerBattleHistory(client, baseUrl)
+
+		currentBattleHashes := make(map[string]struct{})
+		for _, battle := range battles {
+			currentBattleHashes[getBattleHashId(battle)] = struct{}{}
+		}
+
+		log.Printf("Found %d pre-existing battles in history\n", len(currentBattleHashes))
+
+		return currentBattleHashes
 	}
 }
 
@@ -126,12 +150,12 @@ func requestPlayerBattleHistory(client *http.Client, baseUrl string) []Battle {
 		return battles
 	}
 
-    // testJson, err := json.Marshal(battles)
-    // if err != nil {
-    //     log.Println(err)
-    // }
+	// testJson, err := json.Marshal(battles)
+	// if err != nil {
+	//     log.Println(err)
+	// }
 
-    // os.WriteFile("Proxy.json", testJson, os.ModePerm)
+	// os.WriteFile("Proxy.json", testJson, os.ModePerm)
 
 	return battles
 }
@@ -161,7 +185,7 @@ func processBattleHistory(client *http.Client, alreadyProcessedBattleHashes map[
 		}
 
 		log.Printf("Processing deck: ")
-        log.Printf("Battle time %s, Opponent: %s", battle.BattleTime, battle.Opponent[0].Name)
+		log.Printf("Battle time %s, Opponent: %s", battle.BattleTime, battle.Opponent[0].Name)
 		for _, card := range team.Cards {
 			log.Printf("%s ", card.Name)
 		}
@@ -267,7 +291,7 @@ func makeTrade(c *http.Client, trade TradeAction) error {
 
 func getBattleHashId(battle Battle) string {
 	// Use just the battle time and opponent tag
-	return fmt.Sprintf("%s-%s", battle.BattleTime, battle.Opponent[0].Tag)
+	return fmt.Sprintf("%s-%s-%s", battle.Team[0].Tag, battle.BattleTime, battle.Opponent[0].Tag)
 }
 
 func trophyChangeIsRecordMe(trophyChange int64) bool {
