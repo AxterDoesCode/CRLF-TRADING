@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TradingPortal from './components/TradingPortal';
 import ResultsPortal from './components/ResultsPortal';
 import { FinanceExample } from './src/FinanceExample';
 import "@fontsource/luckiest-guy";
 import "@fontsource/bangers";
 import "@fontsource/chewy";
+import { button } from 'framer-motion/m';
 
 type Tab = 'stats' | 'market';
 
@@ -14,15 +15,48 @@ export default function Home() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [isTradingOpen, setIsTradingOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('stats');
+  const [inputValue, setInputValue] = useState(''); // What user is typing
+  const [searchQuery, setSearchQuery] = useState(''); // Actual search value
+  const [currentTime, setCurrentTime] = useState(() => {
+    const now = Date.now();
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    return Math.floor((now - startOfDay.getTime()) / 1000);
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+      setCurrentTime(Math.floor((now - startOfDay.getTime()) / 1000));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleTradeSubmitted = () => {
-    // Trigger a refresh of the results portal
     setRefreshKey(prev => prev + 1);
+  };
+
+  const handleSearch = () => {
+    setSearchQuery(inputValue);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handleClear = () => {
+    setInputValue('');
+    setSearchQuery('');
   };
 
   const tabs = [
     { id: 'stats' as Tab, label: 'My Trading Stats', icon: '⚔️' },
-    { id: 'market' as Tab, label: 'Market Dashboard', icon: '👑' },
+    // { id: 'market' as Tab, label: 'Market Dashboard', icon: '👑' },
   ];
 
   return (
@@ -47,24 +81,53 @@ export default function Home() {
           </div>
         </header>
 
+        {/* Search Bar */}
+        <div className="mb-6 max-w-2xl mx-auto">
+          <div className="relative flex gap-2">
+            <input
+              type="text"
+              placeholder="Search a player"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyPress={handleKeyPress}
+              className="flex-1 px-6 py-4 bg-gradient-to-r from-slate-800 to-slate-900 border-2 border-yellow-500 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/50 font-bold text-lg transition-all"
+            />
+            {inputValue && (
+              <button
+                onClick={handleClear}
+                className="absolute right-24 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+              >
+                ✕
+              </button>
+            )}
+            <button
+              onClick={handleSearch}
+              className="px-6 py-4 cr-button rounded-xl font-bold text-lg transition-all hover:scale-105"
+            >
+              🔍 Search
+            </button>
+          </div>
+        </div>
+
         {/* Tab Navigation */}
-        <div className="mb-6">
+        {/* <div className="mb-6">
           <div className="flex gap-3 justify-center">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-8 py-4 font-black text-lg transition-all rounded-t-2xl relative  chewy-regular ${activeTab === tab.id
-                  ? 'cr-button text-white'
-                  : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
-                  }`}
+                className={`px-8 py-4 font-black text-lg transition-all rounded-t-2xl relative ${
+                  activeTab === tab.id
+                    ? 'cr-button text-white'
+                    : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
+                }`}
               >
                 <span className="mr-2">{tab.icon}</span>
                 {tab.label}
               </button>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Tab Content */}
         <div
@@ -93,14 +156,14 @@ export default function Home() {
                   </p>
                 </div>
                 <div className="flex-1 min-h-0">
-                  <FinanceExample />
+                  <FinanceExample playerId={searchQuery} currentTime={Date.now()} />
                 </div>
               </>
             )}
 
             {activeTab === 'stats' && (
               <div className="overflow-y-auto">
-                <ResultsPortal key={refreshKey} />
+                <ResultsPortal key={refreshKey} player={searchQuery} />
               </div>
             )}
           </div>
@@ -108,10 +171,10 @@ export default function Home() {
 
         {/* Floating Trading Portal */}
         <div
-          className={`fixed top-[0%] right-6 z-50 transition-transform duration-500 ease-in-out 
+          className={`fixed top-6 right-6 z-50 transition-transform duration-500 ease-in-out 
         ${isTradingOpen ? 'translate-x-0' : 'translate-x-full'}
       `}
-          style={{ width: '30%', height: '10%' }}
+          style={{ width: '30%', height: 'calc(100vh - 3rem)' }}
         >
           {/* Toggle Button */}
           <button
@@ -134,13 +197,12 @@ export default function Home() {
                   'Close Trading'
                 }
               </div>
-
             </div>
           </button>
 
           {/* Trading Portal Panel */}
           <div
-            className="cr-stats-panel shadow-2xl rounded-2xl overflow-hidden overflow-y-auto relative"
+            className="cr-stats-panel shadow-2xl rounded-2xl overflow-hidden h-full relative"
             style={{
               backgroundImage: 'url(/res/Spending_the_Loot.png)',
               backgroundSize: 'cover',
@@ -149,7 +211,7 @@ export default function Home() {
             }}
           >
             <div className="absolute inset-0 bg-slate-900/85 rounded-2xl" />
-            <div className="relative z-10">
+            <div className="relative z-10 h-full overflow-y-auto">
               <TradingPortal onTradeSubmitted={handleTradeSubmitted} />
             </div>
           </div>

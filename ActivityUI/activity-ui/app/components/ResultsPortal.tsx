@@ -31,76 +31,49 @@ interface ChartDataPoint {
   [key: string]: number; // For individual stock values
 }
 
-const STARTING_PORTFOLIO_VALUE = 5000; // $100k starting value
+const STARTING_PORTFOLIO_VALUE = 5000; // $5k starting value
 const MAX_CHART_POINTS = 60; // Keep last 60 data points
 
 // Define colors outside component to prevent recreation
 const STOCK_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
-export default function ResultsPortal() {
-  const { portfolio, isLoading } = usePortfolio('2LGQJVR2C');
+export default function ResultsPortal({ player }: { player: string }) {
+  const { portfolio, isLoading } = usePortfolio(player);
   const [positions, setPositions] = useState<Position[]>([]);
   const [profitLoss, setProfitLoss] = useState<ProfitLoss | null>(null);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [stockSymbols, setStockSymbols] = useState<string[]>([]);
   const gridRef = useRef<AgGridReact>(null);
   const lastProcessedTimestamp = useRef<number>(-1);
+  const isInitialized = useRef<boolean>(false);
 
-  // AG Grid column definitions
+  // AG Grid column definitions - removed P&L columns
   const columnDefs = useMemo<ColDef<Position>[]>(() => [
     {
       field: 'symbol',
       headerName: 'Symbol',
-      width: 100,
+      width: 120,
       cellStyle: { fontWeight: '600' }
     },
     {
       field: 'shares',
       headerName: 'Shares',
-      width: 100,
+      width: 120,
       type: 'rightAligned',
     },
     {
       field: 'currentPrice',
       headerName: 'Current Price',
-      width: 130,
+      width: 150,
       type: 'rightAligned',
       valueFormatter: (params) => `$${params.value?.toFixed(2) || '0.00'}`,
     },
     {
       field: 'totalValue',
       headerName: 'Total Value',
-      width: 130,
+      width: 150,
       type: 'rightAligned',
       valueFormatter: (params) => `$${params.value?.toFixed(2) || '0.00'}`,
-    },
-    {
-      field: 'profitLoss',
-      headerName: 'P&L',
-      width: 120,
-      type: 'rightAligned',
-      cellStyle: (params) => ({
-        color: params.value >= 0 ? '#16a34a' : '#dc2626',
-        fontWeight: '600'
-      }),
-      valueFormatter: (params) => {
-        const val = params.value || 0;
-        return `${val >= 0 ? '+' : ''}$${val.toFixed(2)}`;
-      },
-    },
-    {
-      field: 'profitLossPercent',
-      headerName: 'P&L %',
-      width: 100,
-      type: 'rightAligned',
-      cellStyle: (params) => ({
-        color: params.value >= 0 ? '#16a34a' : '#dc2626',
-        fontWeight: '600'
-      }),
-      valueFormatter: (params) => {
-        const val = params.value || 0;
-        return `${val >= 0 ? '+' : ''}${val.toFixed(2)}%`;
-      },
     },
   ], []);
 
@@ -109,6 +82,29 @@ export default function ResultsPortal() {
     filter: true,
     resizable: true,
   }), []);
+
+  // Helper function to create a chart data point from a snapshot
+  const createChartPoint = (snapshot: any): ChartDataPoint => {
+    const point: ChartDataPoint = {
+      time: snapshot.timestamp,
+      cash: snapshot.cash.value,
+      totalValue: 0,
+    };
+
+    let total = snapshot.cash.value;
+
+    // Add each stock's value
+    for (const key in snapshot) {
+      if (key !== 'timestamp' && key !== 'cash') {
+        const stockValue = snapshot[key].value;
+        point[key] = stockValue;
+        total += stockValue;
+      }
+    }
+
+    point.totalValue = total;
+    return point;
+  };
 
   useEffect(() => {
     if (!portfolio || portfolio.length === 0) return;
@@ -183,25 +179,23 @@ export default function ResultsPortal() {
       stocksValue,
     });
 
-    // Create new chart point from latest snapshot
-    const newPoint: ChartDataPoint = {
-      time: latestSnapshot.timestamp,
-      cash: latestSnapshot.cash.value,
-      totalValue: 0,
-    };
+    // Initialize chart data with all available snapshots on first load
+    if (!isInitialized.current) {
+      // Convert all snapshots to chart points
+      const allPoints = portfolio.map(snapshot => createChartPoint(snapshot));
 
-    let total = latestSnapshot.cash.value;
+      // Keep only the last MAX_CHART_POINTS
+      const initialData = allPoints.length > MAX_CHART_POINTS
+        ? allPoints.slice(allPoints.length - MAX_CHART_POINTS)
+        : allPoints;
 
-    // Add each stock's value
-    for (const key in latestSnapshot) {
-      if (key !== 'timestamp' && key !== 'cash') {
-        const stockValue = latestSnapshot[key].value;
-        newPoint[key] = stockValue;
-        total += stockValue;
-      }
+      setChartData(initialData);
+      isInitialized.current = true;
+      return;
     }
 
-    newPoint.totalValue = total;
+    // After initialization, do incremental updates
+    const newPoint = createChartPoint(latestSnapshot);
 
     // Append new point and remove old ones if exceeding max
     setChartData(prevData => {
@@ -221,6 +215,25 @@ export default function ResultsPortal() {
     });
   }, [portfolio]);
 
+  // Calculate Y-axis domain based on chart data
+  const yAxisDomain = useMemo(() => {
+    if (chartData.length === 0) return ['auto', 'auto'];
+
+    // Get the oldest value in the current chart window
+    const oldestValue = chartData[0].totalValue;
+
+    // Calculate ±20% range
+    const margin = oldestValue * 0.2;
+    const minValue = oldestValue - margin;
+    const maxValue = oldestValue + margin;
+
+    // Round to nice numbers for better visual
+    const roundedMin = Math.floor(minValue / 100) * 100;
+    const roundedMax = Math.ceil(maxValue / 100) * 100;
+
+    return [roundedMin, roundedMax];
+  }, [chartData]);
+
   // Memoize the chart component to prevent unnecessary re-renders
   const chart = useMemo(() => (
     <LineChart data={chartData}>
@@ -234,7 +247,8 @@ export default function ResultsPortal() {
       <YAxis
         stroke="#f39c12"
         style={{ fontSize: '10px', fontWeight: 'bold' }}
-        tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+        tickFormatter={(value) => `$${(value / 1000).toFixed(1)}k`}
+        domain={yAxisDomain}
       />
       <Tooltip
         formatter={(value: number) => `$${value.toFixed(2)}`}
@@ -258,33 +272,8 @@ export default function ResultsPortal() {
         name="Total Value"
         isAnimationActive={false}
       />
-
-      {/* Cash Line */}
-      {/* <Line
-        type="monotone"
-        dataKey="cash"
-        stroke="#60a5fa"
-        strokeWidth={1}
-        dot={false}
-        name="Cash"
-        isAnimationActive={false}
-      /> */}
-
-      {/* Individual Stock Lines */}
-      {/* {stockSymbols.map((symbol, index) => (
-        <Line
-          key={symbol}
-          type="monotone"
-          dataKey={symbol}
-          stroke={STOCK_COLORS[index % STOCK_COLORS.length]}
-          strokeWidth={1}
-          dot={false}
-          name={symbol}
-          isAnimationActive={false}
-        />
-      ))} */}
     </LineChart>
-  ), [chartData, stockSymbols]);
+  ), [chartData, stockSymbols, yAxisDomain]);
 
   return (
     <div className="h-full overflow-y-auto">
