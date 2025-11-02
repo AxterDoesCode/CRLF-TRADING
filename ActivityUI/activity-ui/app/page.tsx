@@ -1,20 +1,53 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TradingPortal from './components/TradingPortal';
 import ResultsPortal from './components/ResultsPortal';
 import { FinanceExample } from './src/FinanceExample';
 
-type Tab =  'stats' | 'market';
+type Tab = 'stats' | 'market';
 
 export default function Home() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [isTradingOpen, setIsTradingOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('stats');
+  const [inputValue, setInputValue] = useState(''); // What user is typing
+  const [searchQuery, setSearchQuery] = useState(''); // Actual search value
+  const [currentTime, setCurrentTime] = useState(() => {
+    const now = Date.now();
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    return Math.floor((now - startOfDay.getTime()) / 1000);
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+      setCurrentTime(Math.floor((now - startOfDay.getTime()) / 1000));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleTradeSubmitted = () => {
-    // Trigger a refresh of the results portal
     setRefreshKey(prev => prev + 1);
+  };
+
+  const handleSearch = () => {
+    setSearchQuery(inputValue);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handleClear = () => {
+    setInputValue('');
+    setSearchQuery('');
   };
 
   const tabs = [
@@ -36,13 +69,41 @@ export default function Home() {
           </div>
           <div className="pt-50">
             <h1 className="text-5xl font-bold text-white mb-2 cr-title">
-              ⚔️ C.R.L.F. TRADING ARENA ⚔️
+              ⚔️ C.R.F.D. TRADING ARENA ⚔️
             </h1>
             <p className="text-xl text-white cr-subtitle">
               🏆 Execute trades using legendary battle deck strategies 🏆
             </p>
           </div>
         </header>
+
+        {/* Search Bar */}
+        <div className="mb-6 max-w-2xl mx-auto">
+          <div className="relative flex gap-2">
+            <input
+              type="text"
+              placeholder="Search a player"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyPress={handleKeyPress}
+              className="flex-1 px-6 py-4 bg-gradient-to-r from-slate-800 to-slate-900 border-2 border-yellow-500 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/50 font-bold text-lg transition-all"
+            />
+            {inputValue && (
+              <button
+                onClick={handleClear}
+                className="absolute right-24 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+              >
+                ✕
+              </button>
+            )}
+            <button
+              onClick={handleSearch}
+              className="px-6 py-4 cr-button rounded-xl font-bold text-lg transition-all hover:scale-105"
+            >
+              🔍 Search
+            </button>
+          </div>
+        </div>
 
         {/* Tab Navigation */}
         <div className="mb-6">
@@ -51,10 +112,11 @@ export default function Home() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-8 py-4 font-black text-lg transition-all rounded-t-2xl relative ${activeTab === tab.id
-                  ? 'cr-button text-white'
-                  : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
-                  }`}
+                className={`px-8 py-4 font-black text-lg transition-all rounded-t-2xl relative ${
+                  activeTab === tab.id
+                    ? 'cr-button text-white'
+                    : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
+                }`}
               >
                 <span className="mr-2">{tab.icon}</span>
                 {tab.label}
@@ -65,17 +127,19 @@ export default function Home() {
 
         {/* Tab Content */}
         <div
-          className={`cr-stats-panel p-6 relative ${activeTab === 'market' ? 'h-[calc(100vh)]' : ''}`}
+          className={`cr-stats-panel p-6 relative ${
+            activeTab === 'market' ? 'h-[calc(100vh)]' : ''
+          }`}
           style={{
-            backgroundImage: activeTab === 'market'
-              ? 'url(/res/PurpleEyesBG.png)'
-              : 'url(/res/73_SwordInTheMouth_BG.png)',
+            backgroundImage:
+              activeTab === 'market'
+                ? 'url(/res/PurpleEyesBG.png)'
+                : 'url(/res/73_SwordInTheMouth_BG.png)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundBlendMode: 'overlay',
           }}
         >
-          {/* Overlay for better text readability */}
           <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 to-slate-800/90 rounded-2xl" />
 
           <div className="relative z-10 h-full flex flex-col">
@@ -90,67 +154,44 @@ export default function Home() {
                   </p>
                 </div>
                 <div className="flex-1 min-h-0">
-                  <FinanceExample />
+                  <FinanceExample playerId="player_002" currentTime={currentTime} />
                 </div>
               </>
             )}
 
             {activeTab === 'stats' && (
               <div className="overflow-y-auto">
-                <ResultsPortal key={refreshKey} />
+                <ResultsPortal key={refreshKey} player={searchQuery} />
               </div>
             )}
           </div>
         </div>
 
-        {/* Floating Trading Portal */}
-        <div
-          className={`fixed top-[0%] right-6 z-50 transition-transform duration-500 ease-in-out 
-        ${isTradingOpen ? 'translate-x-0' : 'translate-x-full'}
-      `}
-          style={{ width: '30%', height: '10%' }}
+        {/* Floating Trade Button */}
+        <button
+          onClick={() => setIsTradingOpen(true)}
+          className="fixed bottom-8 right-8 cr-button px-8 py-4 rounded-full shadow-2xl hover:scale-110 transition-transform font-black text-xl z-50"
         >
-          {/* Toggle Button */}
-          <button
-            onClick={() => setIsTradingOpen(!isTradingOpen)}
-            className="cr-button absolute left-0 top-0 -translate-x-full text-white px-1 py-1 rounded-l-2xl shadow-2xl flex flex-col items-center gap-3"
-            aria-label={isTradingOpen ? 'Close Trading Panel' : 'Open Trading Panel'}
-          >
-          <div class='flex flex-row'>
-            <svg
-              className={`w-6 h-6 transition-transform duration-300 ${isTradingOpen ? 'rotate-0' : 'rotate-180'}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
-            </svg>
-            <div>
-              {!isTradingOpen ? 
-              'Open Trading':
-              'Close Trading'
-              }
-            </div>
+          ⚔️ EXECUTE TRADE
+        </button>
 
-          </div>
-          </button>
-
-          {/* Trading Portal Panel */}
-          <div
-            className="cr-stats-panel shadow-2xl rounded-2xl overflow-hidden max-h-[calc(100vh)] overflow-y-auto relative"
-            style={{
-              backgroundImage: 'url(/res/Spending_the_Loot.png)',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundBlendMode: 'overlay',
-            }}
-          >
-            <div className="absolute inset-0 bg-slate-900/85 rounded-2xl" />
-            <div className="relative z-10">
-              <TradingPortal onTradeSubmitted={handleTradeSubmitted} />
+        {/* Trading Portal Modal */}
+        {isTradingOpen && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+            <div className="relative max-w-2xl w-full">
+              <button
+                onClick={() => setIsTradingOpen(false)}
+                className="absolute -top-4 -right-4 bg-red-600 hover:bg-red-700 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-2xl z-10 transition-colors"
+              >
+                ✕
+              </button>
+              <TradingPortal
+                onClose={() => setIsTradingOpen(false)}
+                onTradeSubmitted={handleTradeSubmitted}
+              />
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
