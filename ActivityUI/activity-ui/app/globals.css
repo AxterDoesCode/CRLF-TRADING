@@ -109,6 +109,40 @@ body {
   }
 }
 
+/* CR Button - Green variant */
+.cr-button-import {
+  background: linear-gradient(180deg, #4cd964 0%, #2ecc71 100%);
+  border: 3px solid #1e8449;
+  border-radius: 12px;
+  box-shadow:
+    0 6px 0 #145a32,
+    0 8px 16px rgba(0, 0, 0, 0.3);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.1s ease;
+  position: relative;
+  top: 0;
+  color: white;
+}
+
+/* Hover and active effects */
+.cr-button-import:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 0 #145a32,
+    0 10px 20px rgba(0, 0, 0, 0.4);
+  filter: brightness(1.15);
+}
+
+.cr-button-import:active {
+  top: 4px;
+  box-shadow:
+    0 2px 0 #145a32,
+    0 4px 8px rgba(0, 0, 0, 0.3);
+  filter: brightness(0.9);
+}
+
 /* CR Button - Clear variant */
 .cr-button-reset {
   background: linear-gradient(180deg, #ff4b2b 0%, #c0392b 100%);
@@ -272,4 +306,14 @@ body {
 
 .cr-input::placeholder {
   color: rgba(255, 255, 255, 0.5);
+}
+
+
+.qr-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  margin: 60 auto;
+  /* Centers horizontally */
 }

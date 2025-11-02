@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import TradingPortal from './components/TradingPortal';
 import ResultsPortal from './components/ResultsPortal';
 import { FinanceExample } from './src/FinanceExample';
+import { button } from 'framer-motion/m';
 
 type Tab = 'stats' | 'market';
 
@@ -127,19 +128,17 @@ export default function Home() {
 
         {/* Tab Content */}
         <div
-          className={`cr-stats-panel p-6 relative ${
-            activeTab === 'market' ? 'h-[calc(100vh)]' : ''
-          }`}
+          className={`cr-stats-panel p-6 relative ${activeTab === 'market' ? 'h-[calc(100vh)]' : ''}`}
           style={{
-            backgroundImage:
-              activeTab === 'market'
-                ? 'url(/res/PurpleEyesBG.png)'
-                : 'url(/res/73_SwordInTheMouth_BG.png)',
+            backgroundImage: activeTab === 'market'
+              ? 'url(/res/PurpleEyesBG.png)'
+              : 'url(/res/73_SwordInTheMouth_BG.png)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundBlendMode: 'overlay',
           }}
         >
+          {/* Overlay for better text readability */}
           <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 to-slate-800/90 rounded-2xl" />
 
           <div className="relative z-10 h-full flex flex-col">
@@ -154,7 +153,7 @@ export default function Home() {
                   </p>
                 </div>
                 <div className="flex-1 min-h-0">
-                  <FinanceExample playerId="player_002" currentTime={currentTime} />
+                  <FinanceExample playerId={searchQuery} currentTime={Date.now()} />
                 </div>
               </>
             )}
@@ -167,31 +166,53 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Floating Trade Button */}
-        <button
-          onClick={() => setIsTradingOpen(true)}
-          className="fixed bottom-8 right-8 cr-button px-8 py-4 rounded-full shadow-2xl hover:scale-110 transition-transform font-black text-xl z-50"
+        {/* Floating Trading Portal */}
+        <div
+          className={`fixed top-6 right-6 z-50 transition-transform duration-500 ease-in-out 
+        ${isTradingOpen ? 'translate-x-0' : 'translate-x-full'}
+      `}
+          style={{ width: '30%', height: 'calc(100vh - 3rem)' }}
         >
-          ⚔️ EXECUTE TRADE
-        </button>
-
-        {/* Trading Portal Modal */}
-        {isTradingOpen && (
-          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-            <div className="relative max-w-2xl w-full">
-              <button
-                onClick={() => setIsTradingOpen(false)}
-                className="absolute -top-4 -right-4 bg-red-600 hover:bg-red-700 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-2xl z-10 transition-colors"
+          {/* Toggle Button */}
+          <button
+            onClick={() => setIsTradingOpen(!isTradingOpen)}
+            className="cr-button absolute left-0 top-0 -translate-x-full text-white px-1 py-1 rounded-l-2xl shadow-2xl flex flex-col items-center gap-3"
+            aria-label={isTradingOpen ? 'Close Trading Panel' : 'Open Trading Panel'}
+          >
+            <div className='flex flex-row'>
+              <svg
+                className={`w-6 h-6 transition-transform duration-300 ${isTradingOpen ? 'rotate-0' : 'rotate-180'}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                ✕
-              </button>
-              <TradingPortal
-                onClose={() => setIsTradingOpen(false)}
-                onTradeSubmitted={handleTradeSubmitted}
-              />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+              </svg>
+              <div>
+                {!isTradingOpen ?
+                  'Open Trading' :
+                  'Close Trading'
+                }
+              </div>
+            </div>
+          </button>
+
+          {/* Trading Portal Panel */}
+          <div
+            className="cr-stats-panel shadow-2xl rounded-2xl overflow-hidden h-full relative"
+            style={{
+              backgroundImage: 'url(/res/Spending_the_Loot.png)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundBlendMode: 'overlay',
+            }}
+          >
+            <div className="absolute inset-0 bg-slate-900/85 rounded-2xl" />
+            <div className="relative z-10 h-full overflow-y-auto">
+              <TradingPortal onTradeSubmitted={handleTradeSubmitted} />
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
