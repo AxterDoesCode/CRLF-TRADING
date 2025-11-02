@@ -24,7 +24,7 @@ const PLAYERTAGURI = "%232YLCP0R8"
 const PLAYERTAG = "2YLCP0R8"
 
 func main() {
-	c := &http.Client{}
+	client := &http.Client{}
 	baseUrl := ROYALE_API_URL
 
 	err := godotenv.Load()
@@ -33,19 +33,36 @@ func main() {
 		return
 	}
 
-	alreadyProcessedBattleHashes := make(map[string]struct{})
+	var alreadyProcessedBattleHashes map[string]struct{}
 
 	interval := 5 * time.Second
 	ticker := time.NewTicker(interval)
+
+	fmt.Println("Service about to start")
+
+	alreadyProcessedBattleHashes = getCurrentHistoryBattleHashes(client, baseUrl)
+
+	fmt.Println("Saved pre-existing battle hashes")
 
 	fmt.Println("Service running so swag")
 
 	for {
 		select {
 		case <-ticker.C:
-			runIteration(alreadyProcessedBattleHashes, c, baseUrl)
+			runIteration(alreadyProcessedBattleHashes, client, baseUrl)
 		}
 	}
+}
+
+func getCurrentHistoryBattleHashes(client *http.Client, baseUrl string) map[string]struct{} {
+	battles := requestPlayerBattleHistory(client, baseUrl)
+
+	currentBattleHashes := make(map[string]struct{})
+	for _, battle := range battles {
+		currentBattleHashes[getBattleHashId(battle)] = struct{}{}
+	}
+
+	return currentBattleHashes
 }
 
 func runIteration(alreadyProcessedBattleHashes map[string]struct{}, client *http.Client, baseUrl string) {
@@ -240,7 +257,7 @@ func makeTrade(c *http.Client, trade TradeAction) error {
 
 func getBattleHashId(battle Battle) string {
 	// Use just the battle time and opponent tag
-	return fmt.Sprintf("%s-%s", battle.BattleTime, battle.Opponent[0].Tag)
+	return fmt.Sprintf("%s-%s-%s", battle.Team[0].Tag, battle.BattleTime, battle.Opponent[0].Tag)
 }
 
 func trophyChangeIsRecordMe(trophyChange int64) bool {
