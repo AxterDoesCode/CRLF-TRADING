@@ -13,6 +13,12 @@ app.use(express.json());
 
 const players = new Map();
 
+const makeInitialPlayer = (playerId) => ({
+    id: playerId,
+    virtual_balance: 5000.00,
+    orders: [],
+});
+
 app.get("/price-history", (req, res) => {
     const T = parseInt(req.query.T);
     const allHistory = [];
@@ -30,11 +36,7 @@ app.post("/player", (req, res) => {
         return res.status(400).json({ error: "Player already exists" });
     }
 
-    players.set(playerId, {
-        id: playerId,
-        virtual_balance: 5000.00,
-        orders: [],
-    });
+    players.set(playerId, makeInitialPlayer(playerId));
 
     res.json({ message: "Player created", playerId: playerId });
 });
@@ -57,7 +59,9 @@ app.get("/portfolio/:playerId", (req, res) => {
     const T_NOW = parseInt(req.query.T);
 
     if (!player) {
-        return res.status(404).json({ error: "Player not found" });
+        // make a player with empty portfolio
+        players.set(playerId, makeInitialPlayer(playerId));
+        console.log(players);
     }
 
     const portfolioSnapshots = [];
